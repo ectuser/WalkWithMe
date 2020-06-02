@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +17,9 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import java.util.*
 
 
@@ -49,7 +53,18 @@ class MainActivity : AppCompatActivity() {
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             )
         )
-        onMapTap()
+        onMapTapListener()
+        addRotation()
+
+
+        // code that should enable my location but it doesn't work :(
+//        val mLocationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(this), map)
+//        mLocationOverlay.enableMyLocation()
+//        map!!.overlays.add(mLocationOverlay)
+//
+//        var loc = GpsMyLocationProvider(this);
+//        Log.w("Tag", "world")
+
     }
 
     public override fun onResume() {
@@ -97,7 +112,7 @@ class MainActivity : AppCompatActivity() {
         map!!.overlays.add(startMarker)
     }
 
-    private fun onMapTap(){
+    private fun onMapTapListener(){
         val mReceive: MapEventsReceiver = object : MapEventsReceiver {
             override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
                 Toast.makeText(
@@ -114,6 +129,13 @@ class MainActivity : AppCompatActivity() {
             }
         }
         map!!.overlays.add(MapEventsOverlay(mReceive))
+    }
+
+    private fun addRotation(){
+        var mRotationGestureOverlay: RotationGestureOverlay = RotationGestureOverlay(this, map)
+        mRotationGestureOverlay.isEnabled = true
+        map!!.setMultiTouchControls(true)
+        map!!.overlays.add(mRotationGestureOverlay)
     }
 
 //    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
