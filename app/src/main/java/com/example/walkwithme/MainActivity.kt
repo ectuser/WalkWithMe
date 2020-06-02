@@ -4,18 +4,26 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import okhttp3.*
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
+import java.io.IOException
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
     private val REQUEST_PERMISSIONS_REQUEST_CODE = 1
     private var map: MapView? = null
+    private val client = OkHttpClient()
+
+
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -43,6 +51,38 @@ class MainActivity : AppCompatActivity() {
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             )
         )
+
+        val pointFirst = GeoPoint(56.476313, 84.961030)
+        val pointSecond = GeoPoint(56.518821, 85.044477)
+
+        val startMarker = Marker(map)
+        startMarker.position = pointFirst
+        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        map!!.overlays.add(startMarker)
+
+        val finishMarker = Marker(map)
+        finishMarker.position = pointSecond
+        finishMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        map!!.overlays.add(finishMarker)
+
+
+        val apiKey = "98d38f94-d14c-425e-bf07-3704ca5d1491"
+        run("https://graphhopper.com/api/1/route?point=${pointFirst.latitude},${pointFirst.longitude}&point=${pointSecond.latitude},${pointSecond.longitude}&vehicle=foot&locale=en&calc_points=false&key=${apiKey}", startMarker)
+    }
+
+    private fun run(url: String, marker: Marker) {
+        val request = Request.Builder()
+            .url(url)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {}
+            override fun onResponse(call: Call, response: Response) = handleResponse(response, marker)
+        })
+    }
+
+    private fun handleResponse(response: Response, marker: Marker) {
+        marker.title = response.body().toString()
     }
 
     public override fun onResume() {
