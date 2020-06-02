@@ -5,13 +5,19 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import org.osmdroid.config.Configuration
+import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.MapEventsOverlay
+import org.osmdroid.views.overlay.Marker
 import java.util.*
+
 
 class MainActivity : AppCompatActivity() {
     private val REQUEST_PERMISSIONS_REQUEST_CODE = 1
@@ -43,6 +49,7 @@ class MainActivity : AppCompatActivity() {
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             )
         )
+        onMapTap()
     }
 
     public override fun onResume() {
@@ -81,6 +88,66 @@ class MainActivity : AppCompatActivity() {
             )
         }
     }
+
+    private fun setMarker(latitude : Double, longtitude : Double){
+        val startPoint = GeoPoint(latitude, longtitude)
+        val startMarker = Marker(map)
+        startMarker.position = startPoint
+        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        map!!.overlays.add(startMarker)
+    }
+
+    private fun onMapTap(){
+        val mReceive: MapEventsReceiver = object : MapEventsReceiver {
+            override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
+                Toast.makeText(
+                    baseContext,
+                    p.latitude.toString() + " - " + p.longitude,
+                    Toast.LENGTH_LONG
+                ).show()
+                setMarker(p.latitude, p.longitude)
+                return false
+            }
+
+            override fun longPressHelper(p: GeoPoint): Boolean {
+                return false
+            }
+        }
+        map!!.overlays.add(MapEventsOverlay(mReceive))
+    }
+
+//    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+//        val actionType = ev.action
+//        when (actionType) {
+//            MotionEvent.ACTION_UP -> {
+//                val proj: Projection = map!!.getProjection()
+//                val loc: GeoPoint = proj.fromPixels(ev.x.toInt(), ev.y.toInt()) as GeoPoint
+//                val longitude =
+//                    java.lang.Double.toString(loc.longitudeE6.toDouble() / 1000000)
+//                val latitude =
+//                    java.lang.Double.toString(loc.latitudeE6.toDouble() / 1000000)
+//                val toast = Toast.makeText(
+//                    applicationContext,
+//                    "Longitude: $longitude Latitude: $latitude",
+//                    Toast.LENGTH_LONG
+//                )
+//                toast.show();
+//                setMarker(latitude.toDouble(), longitude.toDouble());
+//            }
+//        }
+//        return super.dispatchTouchEvent(ev)
+//    }
+
+
+
+//    fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
+//        Toast.makeText(
+//            baseContext,
+//            p.latitude.toString() + " - " + p.longitude,
+//            Toast.LENGTH_LONG
+//        ).show()
+//        return false
+//    }
 
     private fun requestPermissionsIfNecessary(permissions: Array<String>) {
         val permissionsToRequest =
