@@ -6,11 +6,10 @@ import android.os.StrictMode
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.Request
-import okhttp3.Response
+import okhttp3.*
 import org.osmdroid.bonuspack.kml.KmlDocument
+import org.osmdroid.bonuspack.routing.MapQuestRoadManager
+import org.osmdroid.bonuspack.routing.RoadManager
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
@@ -18,13 +17,16 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import java.io.IOException
 
+
 class MainActivity : AppCompatActivity() {
+    private val client = OkHttpClient()
     var REQUEST_PERMISSIONS_REQUEST_CODE = 1
     var map: MapView? = null
     var mKmlDocument: KmlDocument? = null
 
 
     public override fun onCreate(savedInstanceState: Bundle?) {
+        // useful shit, don't remove
         val policy =
             StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
@@ -32,34 +34,71 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         Configuration.getInstance().userAgentValue = "OBP_Tuto/1.0"
 
+
+        // set the map
         setContentView(R.layout.activity_main)
         map = findViewById(R.id.map)
         map!!.zoomController
             .setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
         map!!.setMultiTouchControls(true)
-        val startPoint = GeoPoint(56.4977, 84.9744)
+        val centerPoint = GeoPoint(56.4977, 84.9744)
         val mapController = map!!.controller
+
+        // show Tomsk on launch
         mapController.setZoom(12.0)
-        mapController.setCenter(startPoint)
+        mapController.setCenter(centerPoint)
+
+        // a couple of markers
+        val startPoint = GeoPoint(56.5144255, 85.0700317)
+        val middlePoint = GeoPoint(56.4901464, 84.9458588)
+        val endPoint = GeoPoint(56.4626023, 84.97184)
+
+        val startMarker = Marker(map)
+        startMarker.position = startPoint
+        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        map!!.overlays.add(startMarker)
+
+        val middleMarker = Marker(map)
+        middleMarker.position = middlePoint
+        middleMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        map!!.overlays.add(middleMarker)
+
+        val endMarker = Marker(map)
+        endMarker.position = endPoint
+        endMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        map!!.overlays.add(endMarker)
 
 
-//        val apiKey = "98d38f94-d14c-425e-bf07-3704ca5d1491"
-//        run("https://graphhopper.com/api/1/route?point=${pointFirst.latitude},${pointFirst.longitude}&point=${pointSecond.latitude},${pointSecond.longitude}&vehicle=foot&locale=en&calc_points=false&key=${apiKey}", startMarker)
+        // building a road
+        val roadManager: RoadManager = MapQuestRoadManager("sudOFI4elaABURi9uNTp74tdaN3scVcb")
+        roadManager.addRequestOption("routeType=fastest")
+        val wayPoints = ArrayList<GeoPoint>()
+        wayPoints.add(startPoint)
+        wayPoints.add(middlePoint)
+        wayPoints.add(endPoint)
+        val road = roadManager.getRoad(wayPoints)
+        val roadOverlay = RoadManager.buildRoadOverlay(road)
+        map!!.overlays.add(roadOverlay)
+
+        startMarker.title = road.mLength.toString()
+
+//        val apiKey = "sudOFI4elaABURi9uNTp74tdaN3scVcb"
+//        run("https://open.mapquestapi.com/guidance/v2/route?key=${apiKey}&from=1555+Blake+St.,+Denver,+CO+80202&to=1701+Wynkoop+St,+Denver,+CO+80202")
     }
 
-//    private fun run(url: String, marker: Marker) {
-//        val request = Request.Builder()
-//            .url(url)
-//            .build()
-//
-//        client.newCall(request).enqueue(object : Callback {
-//            override fun onFailure(call: Call, e: IOException) {}
-//            override fun onResponse(call: Call, response: Response) = handleResponse(response, marker)
-//        })
-//    }
+    private fun run(url: String) {
+        val request = Request.Builder()
+            .url(url)
+            .build()
 
-    private fun handleResponse(response: Response, marker: Marker) {
-        marker.title = response.body().toString()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {}
+            override fun onResponse(call: Call, response: Response) = handleResponse(response)
+        })
+    }
+
+    private fun handleResponse(response: Response) {
+
     }
 
     public override fun onResume() {
