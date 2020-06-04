@@ -1,10 +1,11 @@
 package com.example.walkwithme
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -26,6 +27,7 @@ import java.util.*
 class MainActivity : AppCompatActivity() {
     private val REQUEST_PERMISSIONS_REQUEST_CODE = 1
     private var map: MapView? = null
+    private lateinit var myLocationOverlay : MyLocationNewOverlay
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -55,16 +57,23 @@ class MainActivity : AppCompatActivity() {
         )
         onMapTapListener()
         addRotation()
+        getMyLocation(this)
+
+//        val prov = GpsMyLocationProvider(this)
+//        prov.addLocationSource(LocationManager.NETWORK_PROVIDER)
+//        val locationOverlay = MyLocationNewOverlay(prov, map)
+//        locationOverlay.enableMyLocation()
+//        map!!.overlayManager.add(locationOverlay)
 
 
-        // code that should enable my location but it doesn't work :(
-//        val mLocationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(this), map)
-//        mLocationOverlay.enableMyLocation()
-//        map!!.overlays.add(mLocationOverlay)
-//
-//        var loc = GpsMyLocationProvider(this);
-//        Log.w("Tag", "world")
+    }
 
+    private fun initMyLocationNewOverlay(ctx : Context) {
+        val provider = GpsMyLocationProvider(ctx)
+        provider.addLocationSource(LocationManager.NETWORK_PROVIDER)
+        myLocationOverlay = MyLocationNewOverlay(provider, map)
+        myLocationOverlay.enableMyLocation()
+        map!!.overlays.add(myLocationOverlay)
     }
 
     public override fun onResume() {
@@ -73,6 +82,7 @@ class MainActivity : AppCompatActivity() {
         //if you make changes to the configuration, use
         //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         //Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
+
         map!!.onResume() //needed for compass, my location overlays, v6.0.0 and up
     }
 
@@ -138,27 +148,20 @@ class MainActivity : AppCompatActivity() {
         map!!.overlays.add(mRotationGestureOverlay)
     }
 
-//    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-//        val actionType = ev.action
-//        when (actionType) {
-//            MotionEvent.ACTION_UP -> {
-//                val proj: Projection = map!!.getProjection()
-//                val loc: GeoPoint = proj.fromPixels(ev.x.toInt(), ev.y.toInt()) as GeoPoint
-//                val longitude =
-//                    java.lang.Double.toString(loc.longitudeE6.toDouble() / 1000000)
-//                val latitude =
-//                    java.lang.Double.toString(loc.latitudeE6.toDouble() / 1000000)
-//                val toast = Toast.makeText(
-//                    applicationContext,
-//                    "Longitude: $longitude Latitude: $latitude",
-//                    Toast.LENGTH_LONG
-//                )
-//                toast.show();
-//                setMarker(latitude.toDouble(), longitude.toDouble());
-//            }
-//        }
-//        return super.dispatchTouchEvent(ev)
-//    }
+    private fun getMyLocation(context: Context){
+        val mMyLocationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(context), map)
+        val mapController = map!!.controller
+        mMyLocationOverlay.disableMyLocation()
+        mMyLocationOverlay.disableFollowLocation()
+        mMyLocationOverlay.isDrawAccuracyEnabled = true
+        mMyLocationOverlay.runOnFirstFix {
+            runOnUiThread {
+                mapController.animateTo(mMyLocationOverlay.myLocation)
+                mapController.setZoom(18)
+            }
+        }
+        map!!.overlays.add(mMyLocationOverlay)
+    }
 
 
 
