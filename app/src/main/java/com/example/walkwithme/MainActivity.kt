@@ -45,7 +45,10 @@ class MainActivity : AppCompatActivity() {
         Configuration.getInstance().userAgentValue = "OBP_Tuto/1.0"
 
 
-        //inflate and create the map
+        // I NEED THIS DO NOT REMOVE THE CODE BELOW
+        val ctx = applicationContext
+        Configuration.getInstance()
+            .load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx))
 
         setContentView(R.layout.activity_main)
         map = findViewById<View>(R.id.map) as MapView
