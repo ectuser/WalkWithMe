@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import kotlinx.android.synthetic.main.activity_main.*
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -21,6 +22,8 @@ import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import org.osmdroid.bonuspack.routing.MapQuestRoadManager
+import org.osmdroid.bonuspack.routing.RoadManager
 import java.util.*
 
 
@@ -28,6 +31,10 @@ class MainActivity : AppCompatActivity() {
     private val REQUEST_PERMISSIONS_REQUEST_CODE = 1
     private var map: MapView? = null
     private lateinit var myLocationOverlay : MyLocationNewOverlay
+
+    private var wayPoints = ArrayList<GeoPoint>();
+    private lateinit var lastMarker : Marker;
+
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -45,6 +52,7 @@ class MainActivity : AppCompatActivity() {
         //tile servers will get you banned based on this string
 
         //inflate and create the map
+
         setContentView(R.layout.activity_main)
         map = findViewById<View>(R.id.map) as MapView
         map!!.setTileSource(TileSourceFactory.MAPNIK)
@@ -55,16 +63,12 @@ class MainActivity : AppCompatActivity() {
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             )
         )
+
+
         onMapTapListener()
         addRotation()
         getMyLocation(this)
-
-//        val prov = GpsMyLocationProvider(this)
-//        prov.addLocationSource(LocationManager.NETWORK_PROVIDER)
-//        val locationOverlay = MyLocationNewOverlay(prov, map)
-//        locationOverlay.enableMyLocation()
-//        map!!.overlayManager.add(locationOverlay)
-
+        buildRouteButton.setOnClickListener {buildThreePointsRoute()}
 
     }
 
@@ -120,6 +124,8 @@ class MainActivity : AppCompatActivity() {
         startMarker.position = startPoint
         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
         map!!.overlays.add(startMarker)
+
+        lastMarker = startMarker
     }
 
     private fun onMapTapListener(){
@@ -131,6 +137,7 @@ class MainActivity : AppCompatActivity() {
                     Toast.LENGTH_LONG
                 ).show()
                 setMarker(p.latitude, p.longitude)
+                wayPoints.add(p)
                 return false
             }
 
@@ -161,18 +168,31 @@ class MainActivity : AppCompatActivity() {
             }
         }
         map!!.overlays.add(mMyLocationOverlay)
+
+        //        val prov = GpsMyLocationProvider(this)
+//        prov.addLocationSource(LocationManager.NETWORK_PROVIDER)
+//        val locationOverlay = MyLocationNewOverlay(prov, map)
+//        locationOverlay.enableMyLocation()
+//        map!!.overlayManager.add(locationOverlay)
+    }
+
+    private fun buildThreePointsRoute(){
+        val roadManager: RoadManager = MapQuestRoadManager("sudOFI4elaABURi9uNTp74tdaN3scVcb")
+        roadManager.addRequestOption("routeType=fastest")
+        try{
+            val road = roadManager.getRoad(wayPoints)
+            val roadOverlay = RoadManager.buildRoadOverlay(road)
+            map!!.overlays.add(roadOverlay)
+
+            lastMarker.title = road.mLength.toString()
+        }
+        catch(error : Exception){
+//            Log.d("MyTagTag", error.message);
+        }
     }
 
 
 
-//    fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
-//        Toast.makeText(
-//            baseContext,
-//            p.latitude.toString() + " - " + p.longitude,
-//            Toast.LENGTH_LONG
-//        ).show()
-//        return false
-//    }
 
     private fun requestPermissionsIfNecessary(permissions: Array<String>) {
         val permissionsToRequest =
