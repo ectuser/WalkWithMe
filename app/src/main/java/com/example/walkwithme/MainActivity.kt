@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Bundle
+import android.os.StrictMode
 import android.preference.PreferenceManager
 import android.view.View
 import android.widget.Toast
@@ -24,6 +25,7 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import org.osmdroid.bonuspack.routing.MapQuestRoadManager
 import org.osmdroid.bonuspack.routing.RoadManager
+import org.osmdroid.views.CustomZoomButtonsController
 import java.util.*
 
 
@@ -36,23 +38,24 @@ class MainActivity : AppCompatActivity() {
     private lateinit var lastMarker : Marker;
 
     public override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
-
-        //handle permissions first, before map is created. not depicted here
-
-        //load/initialize the osmdroid configuration, this can be done
+//
+//        //handle permissions first, before map is created. not depicted here
+//
+//        //load/initialize the osmdroid configuration, this can be done
         val ctx = applicationContext
         Configuration.getInstance()
             .load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx))
-        //setting this before the layout is inflated is a good idea
-        //it 'should' ensure that the map has a writable location for the map cache, even without permissions
-        //if no tiles are displayed, you can try overriding the cache path using Configuration.getInstance().setCachePath
-        //see also StorageUtils
-        //note, the load method also sets the HTTP User Agent to your application's package name, abusing osm's
-        //tile servers will get you banned based on this string
-
-        //inflate and create the map
-
+//        //setting this before the layout is inflated is a good idea
+//        //it 'should' ensure that the map has a writable location for the map cache, even without permissions
+//        //if no tiles are displayed, you can try overriding the cache path using Configuration.getInstance().setCachePath
+//        //see also StorageUtils
+//        //note, the load method also sets the HTTP User Agent to your application's package name, abusing osm's
+//        //tile servers will get you banned based on this string
+//
+//        //inflate and create the map
+//
         setContentView(R.layout.activity_main)
         map = findViewById<View>(R.id.map) as MapView
         map!!.setTileSource(TileSourceFactory.MAPNIK)
@@ -65,10 +68,10 @@ class MainActivity : AppCompatActivity() {
         )
 
 
-        onMapTapListener()
-        addRotation()
-        getMyLocation(this)
-        buildRouteButton.setOnClickListener {buildThreePointsRoute()}
+//        onMapTapListener()
+//        addRotation()
+//        getMyLocation(this)
+//        buildRouteButton.setOnClickListener {buildThreePointsRoute()}
 
     }
 
@@ -177,7 +180,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun buildThreePointsRoute(){
-        val roadManager: RoadManager = MapQuestRoadManager("sudOFI4elaABURi9uNTp74tdaN3scVcb")
+        val roadManager: RoadManager = MapQuestRoadManager("D78QNhpQ3CIgWUNlZdUX11GXqnXo3oXU")
         roadManager.addRequestOption("routeType=fastest")
         try{
             val road = roadManager.getRoad(wayPoints)
