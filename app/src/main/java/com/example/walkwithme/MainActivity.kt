@@ -44,10 +44,6 @@ class MainActivity : AppCompatActivity() {
         Configuration.getInstance().userAgentValue = "OBP_Tuto/1.0"
 
 
-        super.onCreate(savedInstanceState)
-        Configuration.getInstance().userAgentValue = "OBP_Tuto/1.0"
-
-
         //inflate and create the map
 
         setContentView(R.layout.activity_main)
