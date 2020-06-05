@@ -25,6 +25,7 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import org.osmdroid.bonuspack.routing.MapQuestRoadManager
 import org.osmdroid.bonuspack.routing.RoadManager
+import org.osmdroid.views.CustomZoomButtonsController
 import java.util.*
 
 
@@ -40,11 +41,15 @@ class MainActivity : AppCompatActivity() {
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
 
+
         super.onCreate(savedInstanceState)
         Configuration.getInstance().userAgentValue = "OBP_Tuto/1.0"
 
 
-        //inflate and create the map
+        // I NEED THIS DO NOT REMOVE THE CODE BELOW
+        val ctx = applicationContext
+        Configuration.getInstance()
+            .load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx))
 
         setContentView(R.layout.activity_main)
         map = findViewById<View>(R.id.map) as MapView
