@@ -1,104 +1,86 @@
 package com.example.walkwithme
 
+import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.os.Bundle
 import android.os.StrictMode
+import android.preference.PreferenceManager
+import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import okhttp3.*
-import org.osmdroid.bonuspack.kml.KmlDocument
+import kotlinx.android.synthetic.main.activity_main.*
+import org.osmdroid.config.Configuration
+import org.osmdroid.events.MapEventsReceiver
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.MapEventsOverlay
+import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import org.osmdroid.bonuspack.routing.MapQuestRoadManager
 import org.osmdroid.bonuspack.routing.RoadManager
-import org.osmdroid.config.Configuration
-import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.CustomZoomButtonsController
-import org.osmdroid.views.MapView
-import org.osmdroid.views.overlay.Marker
-import java.io.IOException
+import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
-    private val client = OkHttpClient()
-    var REQUEST_PERMISSIONS_REQUEST_CODE = 1
-    var map: MapView? = null
-    var mKmlDocument: KmlDocument? = null
+    private val REQUEST_PERMISSIONS_REQUEST_CODE = 1
+    private var map: MapView? = null
+    private lateinit var myLocationOverlay : MyLocationNewOverlay
 
+    private var wayPoints = ArrayList<GeoPoint>();
+    private lateinit var lastMarker : Marker;
 
     public override fun onCreate(savedInstanceState: Bundle?) {
-        // useful shit, don't remove
-        val policy =
-            StrictMode.ThreadPolicy.Builder().permitAll().build()
+        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
 
         super.onCreate(savedInstanceState)
         Configuration.getInstance().userAgentValue = "OBP_Tuto/1.0"
 
 
-        // set the map
+        super.onCreate(savedInstanceState)
+        Configuration.getInstance().userAgentValue = "OBP_Tuto/1.0"
+
+
+        //inflate and create the map
+
         setContentView(R.layout.activity_main)
-        map = findViewById(R.id.map)
-        map!!.zoomController
-            .setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
+        map = findViewById<View>(R.id.map) as MapView
+        map!!.setTileSource(TileSourceFactory.MAPNIK)
+        requestPermissionsIfNecessary(
+            arrayOf( // if you need to show the current location, uncomment the line below
+                // Manifest.permission.ACCESS_FINE_LOCATION,
+                // WRITE_EXTERNAL_STORAGE is required in order to show the map
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+        )
+
         map!!.setMultiTouchControls(true)
         val centerPoint = GeoPoint(56.4977, 84.9744)
         val mapController = map!!.controller
-
-        // show Tomsk on launch
         mapController.setZoom(12.0)
         mapController.setCenter(centerPoint)
 
-        // a couple of markers
-        val startPoint = GeoPoint(56.5144255, 85.0700317)
-        val middlePoint = GeoPoint(56.4901464, 84.9458588)
-        val endPoint = GeoPoint(56.4626023, 84.97184)
 
-        val startMarker = Marker(map)
-        startMarker.position = startPoint
-        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-        map!!.overlays.add(startMarker)
+        onMapTapListener()
+        addRotation()
+        getMyLocation(this)
+        buildRouteButton.setOnClickListener {buildThreePointsRoute()}
 
-        val middleMarker = Marker(map)
-        middleMarker.position = middlePoint
-        middleMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-        map!!.overlays.add(middleMarker)
-
-        val endMarker = Marker(map)
-        endMarker.position = endPoint
-        endMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-        map!!.overlays.add(endMarker)
-
-
-        // building a road
-        val roadManager: RoadManager = MapQuestRoadManager("sudOFI4elaABURi9uNTp74tdaN3scVcb")
-        roadManager.addRequestOption("routeType=fastest")
-        val wayPoints = ArrayList<GeoPoint>()
-        wayPoints.add(startPoint)
-        wayPoints.add(middlePoint)
-        wayPoints.add(endPoint)
-        val road = roadManager.getRoad(wayPoints)
-        val roadOverlay = RoadManager.buildRoadOverlay(road)
-        map!!.overlays.add(roadOverlay)
-
-        startMarker.title = road.mLength.toString()
-
-//        val apiKey = "sudOFI4elaABURi9uNTp74tdaN3scVcb"
-//        run("https://open.mapquestapi.com/guidance/v2/route?key=${apiKey}&from=1555+Blake+St.,+Denver,+CO+80202&to=1701+Wynkoop+St,+Denver,+CO+80202")
     }
 
-    private fun run(url: String) {
-        val request = Request.Builder()
-            .url(url)
-            .build()
-
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {}
-            override fun onResponse(call: Call, response: Response) = handleResponse(response)
-        })
-    }
-
-    private fun handleResponse(response: Response) {
-
+    private fun initMyLocationNewOverlay(ctx : Context) {
+        val provider = GpsMyLocationProvider(ctx)
+        provider.addLocationSource(LocationManager.NETWORK_PROVIDER)
+        myLocationOverlay = MyLocationNewOverlay(provider, map)
+        myLocationOverlay.enableMyLocation()
+        map!!.overlays.add(myLocationOverlay)
     }
 
     public override fun onResume() {
@@ -107,6 +89,7 @@ class MainActivity : AppCompatActivity() {
         //if you make changes to the configuration, use
         //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         //Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
+
         map!!.onResume() //needed for compass, my location overlays, v6.0.0 and up
     }
 
@@ -137,6 +120,77 @@ class MainActivity : AppCompatActivity() {
             )
         }
     }
+
+    private fun setMarker(latitude : Double, longtitude : Double){
+        val startPoint = GeoPoint(latitude, longtitude)
+        val startMarker = Marker(map)
+        startMarker.position = startPoint
+        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        map!!.overlays.add(startMarker)
+
+        lastMarker = startMarker
+    }
+
+    private fun onMapTapListener(){
+        val mReceive: MapEventsReceiver = object : MapEventsReceiver {
+            override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
+                Toast.makeText(
+                    baseContext,
+                    p.latitude.toString() + " - " + p.longitude,
+                    Toast.LENGTH_LONG
+                ).show()
+                setMarker(p.latitude, p.longitude)
+                wayPoints.add(p)
+                return false
+            }
+
+            override fun longPressHelper(p: GeoPoint): Boolean {
+                return false
+            }
+        }
+        map!!.overlays.add(MapEventsOverlay(mReceive))
+    }
+
+    private fun addRotation(){
+        var mRotationGestureOverlay: RotationGestureOverlay = RotationGestureOverlay(this, map)
+        mRotationGestureOverlay.isEnabled = true
+        map!!.setMultiTouchControls(true)
+        map!!.overlays.add(mRotationGestureOverlay)
+    }
+
+    private fun getMyLocation(context: Context){
+        val mMyLocationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(context), map)
+        val mapController = map!!.controller
+        mMyLocationOverlay.disableMyLocation()
+        mMyLocationOverlay.disableFollowLocation()
+        mMyLocationOverlay.isDrawAccuracyEnabled = true
+        mMyLocationOverlay.runOnFirstFix {
+            runOnUiThread {
+                mapController.animateTo(mMyLocationOverlay.myLocation)
+                mapController.setZoom(18)
+            }
+        }
+        map!!.overlays.add(mMyLocationOverlay)
+
+        //        val prov = GpsMyLocationProvider(this)
+//        prov.addLocationSource(LocationManager.NETWORK_PROVIDER)
+//        val locationOverlay = MyLocationNewOverlay(prov, map)
+//        locationOverlay.enableMyLocation()
+//        map!!.overlayManager.add(locationOverlay)
+    }
+
+    private fun buildThreePointsRoute(){
+        val roadManager: RoadManager = MapQuestRoadManager("sudOFI4elaABURi9uNTp74tdaN3scVcb")
+        roadManager.addRequestOption("routeType=pedestrian")
+
+        val road = roadManager.getRoad(wayPoints)
+        val roadOverlay = RoadManager.buildRoadOverlay(road)
+        map!!.overlays.add(roadOverlay)
+        lastMarker.title = road.mLength.toString()
+    }
+
+
+
 
     private fun requestPermissionsIfNecessary(permissions: Array<String>) {
         val permissionsToRequest =
