@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Bundle
+import android.os.StrictMode
 import android.preference.PreferenceManager
 import android.view.View
 import android.widget.Toast
@@ -36,7 +37,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var lastMarker : Marker;
 
     public override fun onCreate(savedInstanceState: Bundle?) {
+        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+        StrictMode.setThreadPolicy(policy)
         super.onCreate(savedInstanceState)
+        Configuration.getInstance().userAgentValue = "OBP_Tuto/1.0"
 
         //handle permissions first, before map is created. not depicted here
 
@@ -178,7 +182,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun buildThreePointsRoute(){
         val roadManager: RoadManager = MapQuestRoadManager("sudOFI4elaABURi9uNTp74tdaN3scVcb")
-        roadManager.addRequestOption("routeType=fastest")
+        roadManager.addRequestOption("routeType=pedestrian")
         try{
             val road = roadManager.getRoad(wayPoints)
             val roadOverlay = RoadManager.buildRoadOverlay(road)
