@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Bundle
+import android.os.StrictMode
 import android.preference.PreferenceManager
 import android.view.View
 import android.widget.Toast
@@ -36,7 +37,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var lastMarker : Marker;
 
     public override fun onCreate(savedInstanceState: Bundle?) {
+        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+        StrictMode.setThreadPolicy(policy)
+
         super.onCreate(savedInstanceState)
+        Configuration.getInstance().userAgentValue = "OBP_Tuto/1.0"
+
 
         //handle permissions first, before map is created. not depicted here
 
@@ -63,6 +69,12 @@ class MainActivity : AppCompatActivity() {
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             )
         )
+
+        map!!.setMultiTouchControls(true)
+        val centerPoint = GeoPoint(56.4977, 84.9744)
+        val mapController = map!!.controller
+        mapController.setZoom(12.0)
+        mapController.setCenter(centerPoint)
 
 
         onMapTapListener()
@@ -178,17 +190,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun buildThreePointsRoute(){
         val roadManager: RoadManager = MapQuestRoadManager("sudOFI4elaABURi9uNTp74tdaN3scVcb")
-        roadManager.addRequestOption("routeType=fastest")
-        try{
-            val road = roadManager.getRoad(wayPoints)
-            val roadOverlay = RoadManager.buildRoadOverlay(road)
-            map!!.overlays.add(roadOverlay)
+        roadManager.addRequestOption("routeType=pedestrian")
 
-            lastMarker.title = road.mLength.toString()
-        }
-        catch(error : Exception){
-//            Log.d("MyTagTag", error.message);
-        }
+        val road = roadManager.getRoad(wayPoints)
+        val roadOverlay = RoadManager.buildRoadOverlay(road)
+        map!!.overlays.add(roadOverlay)
+        lastMarker.title = road.mLength.toString()
     }
 
 
