@@ -44,18 +44,9 @@ class MainActivity : AppCompatActivity() {
         Configuration.getInstance().userAgentValue = "OBP_Tuto/1.0"
 
 
-        //handle permissions first, before map is created. not depicted here
+        super.onCreate(savedInstanceState)
+        Configuration.getInstance().userAgentValue = "OBP_Tuto/1.0"
 
-        //load/initialize the osmdroid configuration, this can be done
-        val ctx = applicationContext
-        Configuration.getInstance()
-            .load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx))
-        //setting this before the layout is inflated is a good idea
-        //it 'should' ensure that the map has a writable location for the map cache, even without permissions
-        //if no tiles are displayed, you can try overriding the cache path using Configuration.getInstance().setCachePath
-        //see also StorageUtils
-        //note, the load method also sets the HTTP User Agent to your application's package name, abusing osm's
-        //tile servers will get you banned based on this string
 
         //inflate and create the map
 
