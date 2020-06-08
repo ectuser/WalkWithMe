@@ -25,7 +25,6 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import org.osmdroid.bonuspack.routing.MapQuestRoadManager
 import org.osmdroid.bonuspack.routing.RoadManager
-import org.osmdroid.views.CustomZoomButtonsController
 import java.util.*
 
 
@@ -46,13 +45,13 @@ class MainActivity : AppCompatActivity() {
         Configuration.getInstance().userAgentValue = "OBP_Tuto/1.0"
 
 
-        // I NEED THIS DO NOT REMOVE THE CODE BELOW
+        // I NEED THIS DO NOT REMOVE THE CODE BELOW / don't shout at me, calm down...
         val ctx = applicationContext
         Configuration.getInstance()
             .load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx))
 
         setContentView(R.layout.activity_main)
-        map = findViewById<View>(R.id.map) as MapView
+        map = findViewById<View>(R.id.Map) as MapView
         map!!.setTileSource(TileSourceFactory.MAPNIK)
         requestPermissionsIfNecessary(
             arrayOf( // if you need to show the current location, uncomment the line below
@@ -72,7 +71,7 @@ class MainActivity : AppCompatActivity() {
         onMapTapListener()
         addRotation()
         getMyLocation(this)
-        buildRouteButton.setOnClickListener {buildThreePointsRoute()}
+        BuildRouteButton.setOnClickListener {buildThreePointsRoute()}
 
     }
 
