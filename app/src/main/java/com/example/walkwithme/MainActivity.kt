@@ -178,6 +178,7 @@ class MainActivity : AppCompatActivity() {
 //        val locationOverlay = MyLocationNewOverlay(prov, map)
 //        locationOverlay.enableMyLocation()
 //        map!!.overlayManager.add(locationOverlay)
+// hello world
     }
 
     private fun buildThreePointsRoute(){
