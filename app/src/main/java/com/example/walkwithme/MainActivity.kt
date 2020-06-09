@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
         Configuration.getInstance().userAgentValue = "OBP_Tuto/1.0"
 
 
-        // I NEED THIS DO NOT REMOVE THE CODE BELOW / don't shout at me, calm down...
+        // I NEED THIS DO NOT REMOVE THE CODE BELOW // don't shout at me, calm down...
         val ctx = applicationContext
         Configuration.getInstance()
             .load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx))
@@ -62,6 +62,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         map!!.setMultiTouchControls(true)
+        map!!.setBuiltInZoomControls(false)
         val centerPoint = GeoPoint(56.4977, 84.9744)
         val mapController = map!!.controller
         mapController.setZoom(12.0)
@@ -121,8 +122,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setMarker(latitude : Double, longtitude : Double){
-        val startPoint = GeoPoint(latitude, longtitude)
+    private fun setMarker(latitude : Double, longitude : Double){
+        val startPoint = GeoPoint(latitude, longitude)
         val startMarker = Marker(map)
         startMarker.position = startPoint
         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
