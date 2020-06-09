@@ -25,6 +25,7 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import org.osmdroid.bonuspack.routing.MapQuestRoadManager
 import org.osmdroid.bonuspack.routing.RoadManager
+import org.osmdroid.views.CustomZoomButtonsController
 import java.util.*
 
 
@@ -62,7 +63,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         map!!.setMultiTouchControls(true)
-        map!!.setBuiltInZoomControls(false)
+        map!!.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
         val centerPoint = GeoPoint(56.4977, 84.9744)
         val mapController = map!!.controller
         mapController.setZoom(12.0)
