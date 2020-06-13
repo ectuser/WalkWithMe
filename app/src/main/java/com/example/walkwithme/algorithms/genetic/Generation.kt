@@ -1,22 +1,20 @@
 package com.example.walkwithme.algorithms.genetic
 
 class Generation<T, V>(
-    generateGenotype:               (ArrayList<Genotype<T>>)    -> Genotype<T>,
-    private val fitness:            (Genotype<T>)               -> V,
-    private val crossover:          (Genotype<T>, Genotype<T>)  -> Genotype<T>,
-    private val mutate:             (Genotype<T>)               -> Genotype<T>,
-    private val selectToCrossover:  (ArrayList<V>)              -> ArrayList<Pair<Int, Int>>,
-    private val selectToMutation:   (ArrayList<V>)              -> ArrayList<Int>,
-    private val selectToSelection:  (ArrayList<V>)              -> ArrayList<Int>
+    private val size:                Int,
+    private val generateGenotype:   ()                                  -> Genotype<T, V>,
+    private val fitness:            (Genotype<T, V>)                    -> V,
+    private val crossover:          (Genotype<T, V>, Genotype<T, V>)    -> Genotype<T, V>,
+    private val mutate:             (Genotype<T, V>)                    -> Genotype<T, V>,
+    private val selectToCrossover:  (List<V>)                           -> List<Pair<Int, Int>>,
+    private val selectToMutation:   (List<V>)                           -> List<Int>,
+    private val selectToSelection:  (List<V>)                           -> List<Int>
 ) {
-    private val genotypes: ArrayList<Genotype<T>> = arrayListOf()
+    private val genotypes: ArrayList<Genotype<T, V>> = arrayListOf()
 
     init {
-        var genotype: Genotype<T>? = generateGenotype(genotypes)
-        while (genotype != null) {
-            genotypes.add(genotype)
-
-            genotype = generateGenotype(genotypes)
+        (0..size).forEach {
+            genotypes.add(generateGenotype())
         }
     }
 
@@ -53,7 +51,7 @@ class Generation<T, V>(
     }
 
     private fun selectionStage(fitnessValues: ArrayList<V>) {
-        val toRemoveItem: ArrayList<Genotype<T>> = arrayListOf()
+        val toRemoveItem: ArrayList<Genotype<T, V>> = arrayListOf()
         val toRemoveIndex: ArrayList<Int> = arrayListOf()
         for (i in 0 until genotypes.size) {
             toRemoveIndex.add(i)
