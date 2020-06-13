@@ -1,0 +1,101 @@
+package com.example.walkwithme.presenter.map
+
+import android.content.Context
+import android.location.LocationManager
+import com.example.walkwithme.MapViewInterface
+import com.example.walkwithme.R
+import org.osmdroid.bonuspack.routing.MapQuestRoadManager
+import org.osmdroid.bonuspack.routing.RoadManager
+import org.osmdroid.events.MapEventsReceiver
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.MapEventsOverlay
+import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import java.util.ArrayList
+
+class MapPresenter(private var mapInterface : MapViewInterface) {
+    private val context : Context = mapInterface as Context
+    private val map : MapView? = mapInterface.map
+    private var wayPoints = ArrayList<GeoPoint>()
+
+    fun setMarker(latitude : Double, longitude : Double) {
+        val startPoint = GeoPoint(latitude, longitude)
+        val startMarker = Marker(map)
+        startMarker.position = startPoint
+        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        startMarker.icon = context.resources.getDrawable(R.drawable.marker)
+
+        map!!.overlays.add(startMarker)
+
+        map.invalidate();
+    }
+
+    fun onMapTapListener(){
+        val mReceive: MapEventsReceiver = object : MapEventsReceiver {
+            override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
+                setMarker(p.latitude, p.longitude)
+                wayPoints.add(p)
+                return false
+            }
+
+            override fun longPressHelper(p: GeoPoint): Boolean {
+                return false
+            }
+        }
+        map!!.overlays.add(MapEventsOverlay(mReceive))
+    }
+
+    fun buildRoute(){
+        val roadManager: RoadManager = MapQuestRoadManager("sudOFI4elaABURi9uNTp74tdaN3scVcb")
+        roadManager.addRequestOption("routeType=pedestrian")
+
+        val road = roadManager.getRoad(wayPoints)
+        val roadOverlay = RoadManager.buildRoadOverlay(road)
+        map!!.overlays.add(roadOverlay)
+//        lastMarker.title = road.mLength.toString()
+
+        map.invalidate();
+    }
+
+    fun addRotation(){
+        val mRotationGestureOverlay: RotationGestureOverlay = RotationGestureOverlay(context, map)
+        mRotationGestureOverlay.isEnabled = true
+        map!!.setMultiTouchControls(true)
+        map.overlays.add(mRotationGestureOverlay)
+    }
+
+    fun getMyLocation(context: Context){
+        val mMyLocationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(context), map)
+        val mapController = map!!.controller
+        mMyLocationOverlay.disableMyLocation()
+        mMyLocationOverlay.disableFollowLocation()
+        mMyLocationOverlay.isDrawAccuracyEnabled = true
+//        mMyLocationOverlay.runOnFirstFix {
+//            runOnUiThread {
+//                mapController.animateTo(mMyLocationOverlay.myLocation)
+//                mapController.setZoom(18)
+//            }
+//        }
+        map.overlays.add(mMyLocationOverlay)
+
+        //        val prov = GpsMyLocationProvider(this)
+//        prov.addLocationSource(LocationManager.NETWORK_PROVIDER)
+//        val locationOverlay = MyLocationNewOverlay(prov, map)
+//        locationOverlay.enableMyLocation()
+//        map!!.overlayManager.add(locationOverlay)
+// hello world
+    }
+
+    private fun initMyLocationNewOverlay(ctx : Context) {
+        // Another way to get location but less perspective
+
+//        val provider = GpsMyLocationProvider(ctx)
+//        provider.addLocationSource(LocationManager.NETWORK_PROVIDER)
+//        myLocationOverlay = MyLocationNewOverlay(provider, map)
+//        myLocationOverlay.enableMyLocation()
+//        map!!.overlays.add(myLocationOverlay)
+    }
+}
