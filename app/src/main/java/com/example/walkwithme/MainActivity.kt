@@ -3,6 +3,8 @@ package com.example.walkwithme
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.graphics.Paint
 import android.location.LocationManager
 import android.os.Bundle
 import android.os.StrictMode
@@ -13,19 +15,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.activity_main.*
+import org.osmdroid.bonuspack.routing.MapQuestRoadManager
+import org.osmdroid.bonuspack.routing.RoadManager
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
-import org.osmdroid.bonuspack.routing.MapQuestRoadManager
-import org.osmdroid.bonuspack.routing.RoadManager
-import org.osmdroid.views.CustomZoomButtonsController
 import java.util.*
 
 
@@ -46,13 +48,13 @@ class MainActivity : AppCompatActivity() {
         Configuration.getInstance().userAgentValue = "OBP_Tuto/1.0"
 
 
-        // I NEED THIS DO NOT REMOVE THE CODE BELOW
+        // I NEED THIS DO NOT REMOVE THE CODE BELOW // don't shout at me, calm down...
         val ctx = applicationContext
         Configuration.getInstance()
             .load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx))
 
         setContentView(R.layout.activity_main)
-        map = findViewById<View>(R.id.map) as MapView
+        map = findViewById<View>(R.id.Map) as MapView
         map!!.setTileSource(TileSourceFactory.MAPNIK)
         requestPermissionsIfNecessary(
             arrayOf( // if you need to show the current location, uncomment the line below
@@ -63,6 +65,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         map!!.setMultiTouchControls(true)
+        map!!.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
         val centerPoint = GeoPoint(56.4977, 84.9744)
         val mapController = map!!.controller
         mapController.setZoom(12.0)
@@ -72,7 +75,7 @@ class MainActivity : AppCompatActivity() {
         onMapTapListener()
         addRotation()
         getMyLocation(this)
-        buildRouteButton.setOnClickListener {buildThreePointsRoute()}
+        BuildRouteButton.setOnClickListener {buildThreePointsRoute()}
 
     }
 
@@ -122,14 +125,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setMarker(latitude : Double, longtitude : Double){
-        val startPoint = GeoPoint(latitude, longtitude)
+    private fun setMarker(latitude : Double, longitude : Double){
+        val startPoint = GeoPoint(latitude, longitude)
         val startMarker = Marker(map)
         startMarker.position = startPoint
         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        startMarker.icon = resources.getDrawable(R.drawable.marker);
         map!!.overlays.add(startMarker)
 
         lastMarker = startMarker
+        map!!.invalidate();
     }
 
     private fun onMapTapListener(){
@@ -138,7 +143,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(
                     baseContext,
                     p.latitude.toString() + " - " + p.longitude,
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 ).show()
                 setMarker(p.latitude, p.longitude)
                 wayPoints.add(p)
@@ -189,10 +194,9 @@ class MainActivity : AppCompatActivity() {
         val roadOverlay = RoadManager.buildRoadOverlay(road)
         map!!.overlays.add(roadOverlay)
         lastMarker.title = road.mLength.toString()
+
+        map!!.invalidate();
     }
-
-
-
 
     private fun requestPermissionsIfNecessary(permissions: Array<String>) {
         val permissionsToRequest =
