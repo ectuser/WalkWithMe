@@ -1,67 +1,53 @@
 package com.example.walkwithme.algorithms.genetic
 
 class Generation<T, V>(
-    private val size:                Int,
-    private val generateGenotype:   ()                                  -> Genotype<T, V>,
-    private val fitness:            (Genotype<T, V>)                    -> V,
-    private val crossover:          (Genotype<T, V>, Genotype<T, V>)    -> Genotype<T, V>,
-    private val mutate:             (Genotype<T, V>)                    -> Genotype<T, V>,
-    private val selectToCrossover:  (List<V>)                           -> List<Pair<Int, Int>>,
-    private val selectToMutation:   (List<V>)                           -> List<Int>,
-    private val selectToSelection:  (List<V>)                           -> List<Int>
+    private val crossover: (Genotype<T, V>, Genotype<T, V>) -> Genotype<T, V>,
+    private val mutate: (Genotype<T, V>) -> Genotype<T, V>,
+    private val selectToCrossover: (List<Genotype<T, V>>) -> List<Pair<Genotype<T, V>, Genotype<T, V>>>,
+    private val selectToMutation: (List<Genotype<T, V>>) -> List<Genotype<T, V>>,
+    private val selectToSelection: (List<Genotype<T, V>>) -> List<Genotype<T, V>>
 ) {
-    private val genotypes: ArrayList<Genotype<T, V>> = arrayListOf()
+    private var _genotypes = arrayListOf<Genotype<T, V>>()
 
-    init {
-        (0..size).forEach {
-            genotypes.add(generateGenotype())
+    val genotypes: ArrayList<Genotype<T, V>>
+        get() = _genotypes
+
+    fun generate(
+        size: Int,
+        generator: () -> Genotype<T, V>
+    ) {
+        _genotypes.clear()
+
+        (0..size).forEach { _ ->
+            _genotypes.add(generator())
         }
     }
 
     fun update() {
-        val fitnessValues: ArrayList<V> = arrayListOf()
-
-        genotypes.forEach {
-            fitnessValues.add(fitness(it))
-        }
-
-        crossoverStage(fitnessValues)
-        mutationStage(fitnessValues)
-        selectionStage(fitnessValues)
+        crossoverStage()
+        mutationStage()
+        selectionStage()
     }
 
-    private fun crossoverStage(fitnessValues: ArrayList<V>) {
-        selectToCrossover(fitnessValues).forEach {
-            val i = it.first
-            val j = it.second
-            val genotype = crossover(genotypes[i], genotypes[j])
+    private fun crossoverStage() {
+        selectToCrossover(_genotypes).forEach {
+            val a = it.first
+            val b = it.second
+            val genotype = crossover(a, b)
 
-            genotypes.add(genotype)
-            fitnessValues.add(fitness(genotype))
+            _genotypes.add(genotype)
         }
     }
 
-    private fun mutationStage(fitnessValues: ArrayList<V>) {
-        selectToMutation(fitnessValues).forEach {
-            val genotype = mutate(genotypes[it])
+    private fun mutationStage() {
+        selectToMutation(_genotypes).forEach {
+            val ind = _genotypes.indexOf(it)
 
-            genotypes[it] = genotype
-            fitnessValues[it] = fitness(genotype)
+            _genotypes[ind] = mutate(it)
         }
     }
 
-    private fun selectionStage(fitnessValues: ArrayList<V>) {
-        val toRemoveItem: ArrayList<Genotype<T, V>> = arrayListOf()
-        val toRemoveIndex: ArrayList<Int> = arrayListOf()
-        for (i in 0 until genotypes.size) {
-            toRemoveIndex.add(i)
-        }
-
-        toRemoveIndex.removeAll(selectToSelection(fitnessValues))
-        toRemoveIndex.forEach {
-            toRemoveItem.add(genotypes[it])
-        }
-
-        genotypes.removeAll(toRemoveItem)
+    private fun selectionStage() {
+        _genotypes = ArrayList(selectToSelection(_genotypes))
     }
 }
