@@ -3,8 +3,6 @@ package com.example.walkwithme
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.Color
-import android.graphics.Paint
 import android.location.LocationManager
 import android.os.Bundle
 import android.os.StrictMode
@@ -14,6 +12,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.walkwithme.presenter.map.MapPresenter
 import kotlinx.android.synthetic.main.activity_main.*
 import org.osmdroid.bonuspack.routing.MapQuestRoadManager
 import org.osmdroid.bonuspack.routing.RoadManager
@@ -30,14 +29,11 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import java.util.*
 
-
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), MapViewInterface {
     private val REQUEST_PERMISSIONS_REQUEST_CODE = 1
-    private var map: MapView? = null
-    private lateinit var myLocationOverlay : MyLocationNewOverlay
+    override var map: MapView? = null
 
-    private var wayPoints = ArrayList<GeoPoint>();
-    private lateinit var lastMarker : Marker;
+    private lateinit var mapPresenter : MapPresenter
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
@@ -48,7 +44,7 @@ class MainActivity : AppCompatActivity() {
         Configuration.getInstance().userAgentValue = "OBP_Tuto/1.0"
 
 
-        // I NEED THIS DO NOT REMOVE THE CODE BELOW // don't shout at me, calm down...
+        // I NEED THIS DO NOT REMOVE THE CODE BELOW // don't shout at me, calm down... // piss off
         val ctx = applicationContext
         Configuration.getInstance()
             .load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx))
@@ -60,9 +56,14 @@ class MainActivity : AppCompatActivity() {
             arrayOf( // if you need to show the current location, uncomment the line below
                 // Manifest.permission.ACCESS_FINE_LOCATION,
                 // WRITE_EXTERNAL_STORAGE is required in order to show the map
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.INTERNET,
+                Manifest.permission.ACCESS_NETWORK_STATE,
+                Manifest.permission.ACCESS_COARSE_LOCATION
             )
         )
+
 
         map!!.setMultiTouchControls(true)
         map!!.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
@@ -71,20 +72,15 @@ class MainActivity : AppCompatActivity() {
         mapController.setZoom(12.0)
         mapController.setCenter(centerPoint)
 
+        // init Presenter
+        mapPresenter = MapPresenter(this)
 
         onMapTapListener()
         addRotation()
         getMyLocation(this)
-        BuildRouteButton.setOnClickListener {buildThreePointsRoute()}
+        BuildRouteButton.setOnClickListener {mapPresenter.buildRoute()}
 
-    }
 
-    private fun initMyLocationNewOverlay(ctx : Context) {
-        val provider = GpsMyLocationProvider(ctx)
-        provider.addLocationSource(LocationManager.NETWORK_PROVIDER)
-        myLocationOverlay = MyLocationNewOverlay(provider, map)
-        myLocationOverlay.enableMyLocation()
-        map!!.overlays.add(myLocationOverlay)
     }
 
     public override fun onResume() {
@@ -125,76 +121,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setMarker(latitude : Double, longitude : Double){
-        val startPoint = GeoPoint(latitude, longitude)
-        val startMarker = Marker(map)
-        startMarker.position = startPoint
-        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-        startMarker.icon = resources.getDrawable(R.drawable.marker);
-        map!!.overlays.add(startMarker)
-
-        lastMarker = startMarker
-        map!!.invalidate();
+    override fun onMapTapListener(){
+        mapPresenter.onMapTapListener()
     }
 
-    private fun onMapTapListener(){
-        val mReceive: MapEventsReceiver = object : MapEventsReceiver {
-            override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
-                Toast.makeText(
-                    baseContext,
-                    p.latitude.toString() + " - " + p.longitude,
-                    Toast.LENGTH_SHORT
-                ).show()
-                setMarker(p.latitude, p.longitude)
-                wayPoints.add(p)
-                return false
-            }
-
-            override fun longPressHelper(p: GeoPoint): Boolean {
-                return false
-            }
-        }
-        map!!.overlays.add(MapEventsOverlay(mReceive))
+    override fun addRotation(){
+        mapPresenter.addRotation()
     }
 
-    private fun addRotation(){
-        var mRotationGestureOverlay: RotationGestureOverlay = RotationGestureOverlay(this, map)
-        mRotationGestureOverlay.isEnabled = true
-        map!!.setMultiTouchControls(true)
-        map!!.overlays.add(mRotationGestureOverlay)
-    }
-
-    private fun getMyLocation(context: Context){
-        val mMyLocationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(context), map)
-        val mapController = map!!.controller
-        mMyLocationOverlay.disableMyLocation()
-        mMyLocationOverlay.disableFollowLocation()
-        mMyLocationOverlay.isDrawAccuracyEnabled = true
-        mMyLocationOverlay.runOnFirstFix {
-            runOnUiThread {
-                mapController.animateTo(mMyLocationOverlay.myLocation)
-                mapController.setZoom(18)
-            }
-        }
-        map!!.overlays.add(mMyLocationOverlay)
-
-        //        val prov = GpsMyLocationProvider(this)
-//        prov.addLocationSource(LocationManager.NETWORK_PROVIDER)
-//        val locationOverlay = MyLocationNewOverlay(prov, map)
-//        locationOverlay.enableMyLocation()
-//        map!!.overlayManager.add(locationOverlay)
-    }
-
-    private fun buildThreePointsRoute(){
-        val roadManager: RoadManager = MapQuestRoadManager("sudOFI4elaABURi9uNTp74tdaN3scVcb")
-        roadManager.addRequestOption("routeType=pedestrian")
-
-        val road = roadManager.getRoad(wayPoints)
-        val roadOverlay = RoadManager.buildRoadOverlay(road)
-        map!!.overlays.add(roadOverlay)
-        lastMarker.title = road.mLength.toString()
-
-        map!!.invalidate();
+    override fun getMyLocation(context: Context){
+        mapPresenter.getMyLocation(context)
     }
 
     private fun requestPermissionsIfNecessary(permissions: Array<String>) {
