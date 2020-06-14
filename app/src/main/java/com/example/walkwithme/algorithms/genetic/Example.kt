@@ -53,7 +53,8 @@ class Example {
             }
 
             val w = points.sumByDouble { it.last() }
-            val fitness = w / abs(l - len)
+            val dl = abs(l - len)
+            val fitness = w / (dl * dl)
             Genotype(genotype.genes, fitness)
         }
 
