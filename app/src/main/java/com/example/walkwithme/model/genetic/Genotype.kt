@@ -1,4 +1,4 @@
-package com.example.walkwithme.algorithms.genetic
+package com.example.walkwithme.model.genetic
 
 data class Genotype<T, V>(
     val genes: List<T>,
