@@ -1,5 +1,7 @@
 package com.example.walkwithme.model.genetic
 
+import java.lang.Exception
+
 class Generation<T, V>(
     private val fitness: (Genotype<T, V>) -> Genotype<T, V>,
     private val bestOf: (Genotype<T, V>, Genotype<T, V>) -> Genotype<T, V>,
@@ -28,7 +30,7 @@ class Generation<T, V>(
             val genotype = fitness(generator())
 
             _genotypes.add(genotype)
-            _best = bestOf(_best, genotype)
+            _best = bestOfWrapper(_best, genotype)
         }
     }
 
@@ -38,6 +40,19 @@ class Generation<T, V>(
         selectionStage()
     }
 
+    private fun bestOfWrapper(
+        genotypeA: Genotype<T, V>,
+        genotypeB: Genotype<T, V>
+    ): Genotype<T, V> {
+        if (genotypeA.fitness == null && genotypeB.fitness == null) {
+            throw Exception("Generation<T, V>.bestOfWrapper: genotypeA.fitness and genotypeB.fitness is null")
+        }
+        if (genotypeA.fitness != null && genotypeB.fitness == null) { return genotypeA }
+        if (genotypeA.fitness == null && genotypeB.fitness != null) { return genotypeB }
+
+        return bestOf(genotypeA, genotypeB)
+    }
+
     private fun crossoverStage() {
         selectToCrossover(_genotypes).forEach {
             val a = it.first
@@ -45,7 +60,7 @@ class Generation<T, V>(
             val genotype = fitness(crossover(a, b))
 
             _genotypes.add(genotype)
-            _best = bestOf(_best, genotype)
+            _best = bestOfWrapper(_best, genotype)
         }
     }
 
@@ -55,7 +70,7 @@ class Generation<T, V>(
             val genotype = fitness(mutate(it))
 
             _genotypes[ind] = genotype
-            _best = bestOf(_best, genotype)
+            _best = bestOfWrapper(_best, genotype)
         }
     }
 
