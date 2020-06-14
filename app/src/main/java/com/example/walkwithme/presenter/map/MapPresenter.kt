@@ -2,6 +2,7 @@ package com.example.walkwithme.presenter.map
 
 import android.content.Context
 import android.location.LocationManager
+import android.widget.Toast
 import com.example.walkwithme.MapViewInterface
 import com.example.walkwithme.R
 import org.osmdroid.bonuspack.routing.MapQuestRoadManager
@@ -70,7 +71,7 @@ class MapPresenter(private var mapInterface : MapViewInterface) {
     fun getMyLocation(context: Context){
         val mMyLocationOverlay = MyLocationNewOverlay(GpsMyLocationProvider(context), map)
         val mapController = map!!.controller
-        mMyLocationOverlay.disableMyLocation()
+        mMyLocationOverlay.enableMyLocation()
         mMyLocationOverlay.disableFollowLocation()
         mMyLocationOverlay.isDrawAccuracyEnabled = true
 //        mMyLocationOverlay.runOnFirstFix {
@@ -81,11 +82,11 @@ class MapPresenter(private var mapInterface : MapViewInterface) {
 //        }
         map.overlays.add(mMyLocationOverlay)
 
-        //        val prov = GpsMyLocationProvider(this)
-//        prov.addLocationSource(LocationManager.NETWORK_PROVIDER)
-//        val locationOverlay = MyLocationNewOverlay(prov, map)
-//        locationOverlay.enableMyLocation()
-//        map!!.overlayManager.add(locationOverlay)
+                val prov = GpsMyLocationProvider(context)
+        prov.addLocationSource(LocationManager.NETWORK_PROVIDER)
+        val locationOverlay = MyLocationNewOverlay(prov, map)
+        locationOverlay.enableMyLocation()
+        map.overlayManager.add(locationOverlay)
 // hello world
     }
 
@@ -97,5 +98,9 @@ class MapPresenter(private var mapInterface : MapViewInterface) {
 //        myLocationOverlay = MyLocationNewOverlay(provider, map)
 //        myLocationOverlay.enableMyLocation()
 //        map!!.overlays.add(myLocationOverlay)
+    }
+
+    fun setDefaultRotation() {
+        map?.mapOrientation = 0f;
     }
 }
