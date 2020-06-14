@@ -1,42 +1,15 @@
 package com.example.walkwithme.model.genetic
 
+import com.example.walkwithme.model.utilities.Random
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.sqrt
-import kotlin.random.Random
 
-class Example {
-    private val len = 6
-    private val random = Random(0)
-    private val points = listOf(
-        listOf(+0.0, 0.0, 1.0),
-        listOf(-1.0, 1.0, 1.0),
-        listOf(-1.0, 2.0, 1.0),
-        listOf(-1.0, 3.0, 1.0),
-        listOf(+0.0, 2.0, 1.0),
-        listOf(-1.0, 1.5, 1.0),
-        listOf(-1.0, 2.5, 1.0),
-        listOf(+0.0, 4.0, 1.0)
-    )
-
-    private fun<T> randomBy(ts: List<T>, p: (T) -> Double): T {
-        var sum = random.nextDouble(ts.map(p).sum())
-        var i = -1
-
-        while (sum > 0) {
-            ++i
-            sum -= p(ts[i])
-        }
-
-        return ts[i]
-    }
-
-    private fun distance(a: List<Double>, b: List<Double>): Double {
-        return sqrt((a[0] - b[0]) * (a[0] - b[0]) + (a[1] - b[1]) * (a[1] - b[1]))
-    }
-
-    fun run() {
+object Algorithms {
+    fun runGenetic(
+        graph: Array<Array<Double>>,
+        length: Double
+    ): Genotype<Int, Double> {
         val genetic = Genetic<Int, Double>()
 
         genetic.setFitness { genotype ->
@@ -49,11 +22,11 @@ class Example {
                 val a = genotype.genes[it + 0]
                 val b = genotype.genes[it + 1]
 
-                l += distance(points[a], points[b])
+                l += graph[a][b]
             }
 
-            val w = points.sumByDouble { it.last() }
-            val dl = abs(l - len)
+            val w = graph.size
+            val dl = abs(l - length)
             val fitness = w / (dl * dl)
             Genotype(genotype.genes, fitness)
         }
@@ -74,7 +47,7 @@ class Example {
 
             val minBound = min(genotypeA.genes.size, genotypeB.genes.size)
             val maxBound = max(genotypeA.genes.size, genotypeB.genes.size)
-            val size = random.nextInt(minBound, maxBound + 1)
+            val size = Random.randInt(minBound, maxBound + 1)
             val genes = arrayListOf<Int>()
 
             (0..size).forEach { _ ->
@@ -107,27 +80,27 @@ class Example {
             val pRemove = 0.25
             val pSwap = 0.25
 
-            var add = random.nextDouble() < pAdd && genesPool.isNotEmpty()
-            var remove = random.nextDouble() < pRemove && genes.size > 2
-            var swap = random.nextDouble() < pSwap && genes.size > 3
+            var add = Random.randDouble() < pAdd && genesPool.isNotEmpty()
+            var remove = Random.randDouble() < pRemove && genes.size > 2
+            var swap = Random.randDouble() < pSwap && genes.size > 3
 
             while (add || remove || swap) {
                 if (add) {
-                    val genesInd = random.nextInt(1, genes.size - 1)
-                    val poolInd = random.nextInt(0, genesPool.size - 1)
+                    val genesInd = Random.randInt(1, genes.size - 1)
+                    val poolInd = Random.randInt(0, genesPool.size - 1)
 
                     genes.add(genesInd, genesPool[poolInd])
                     genesPool.removeAt(poolInd)
                 }
                 if (remove) {
-                    val genesInd = random.nextInt(1, genes.size - 1)
+                    val genesInd = Random.randInt(1, genes.size - 1)
 
                     genesPool.add(genes[genesInd])
                     genes.remove(genesInd)
                 }
                 if (swap) {
-                    val li = random.nextInt(1, genes.size - 1)
-                    val ri = random.nextInt(1, genes.size - 1)
+                    val li = Random.randInt(1, genes.size - 1)
+                    val ri = Random.randInt(1, genes.size - 1)
 
                     if (li != ri) {
                         val lv = genes[li]
@@ -138,9 +111,9 @@ class Example {
                     }
                 }
 
-                add = random.nextDouble() < pAdd && genesPool.isNotEmpty()
-                remove = random.nextDouble() < pRemove && genes.size > 2
-                swap = random.nextDouble() < pSwap && genes.size > 3
+                add = Random.randDouble() < pAdd && genesPool.isNotEmpty()
+                remove = Random.randDouble() < pRemove && genes.size > 2
+                swap = Random.randDouble() < pSwap && genes.size > 3
             }
 
             Genotype(genes)
@@ -150,8 +123,8 @@ class Example {
             val selected = arrayListOf<Pair<Genotype<Int, Double>, Genotype<Int, Double>>>()
 
             while (genotypes.size < generationSize / 2) {
-                val l = random.nextInt(genotypes.size)
-                val r = random.nextInt(genotypes.size)
+                val l = Random.randInt(0, genotypes.size)
+                val r = Random.randInt(0, genotypes.size)
                 if (l != r &&
                     !selected.contains(Pair(genotypes[l], genotypes[r]))
                 ) {
@@ -166,7 +139,7 @@ class Example {
             val selected = arrayListOf<Genotype<Int, Double>>()
 
             while (selected.size < generationSize / 4) {
-                val i = random.nextInt(genotypes.size)
+                val i = Random.randInt(0, genotypes.size)
                 if (!selected.contains(genotypes[i])) {
                     selected.add(genotypes[i])
                 }
@@ -179,7 +152,7 @@ class Example {
             val selected = arrayListOf<Genotype<Int, Double>>()
 
             while (selected.size < generationSize) {
-                val genotype = randomBy(genotypes) { it.fitness!! }
+                val genotype = Random.randBy(genotypes) { it.fitness!! }
                 if (!selected.contains(genotype)) {
                     selected.add(genotype)
                 }
@@ -188,16 +161,16 @@ class Example {
             selected
         }
 
-        genetic.run(512, 2048) {
+        return genetic.run(512, 2048) {
             val genes = arrayListOf<Int>()
             val genesPool = arrayListOf<Int>()
-            val probability = 1 - 2 / (points.size - 2)
+            val probability = 1 - 2 / (graph.size - 2)
 
-            (1 until points.size - 1).forEach {
+            (1 until graph.size - 1).forEach {
                 genesPool.add(it)
             }
 
-            while (genesPool.isNotEmpty() && random.nextDouble() < probability) {
+            while (genesPool.isNotEmpty() && Random.randDouble() < probability) {
                 val point = genesPool.random()
 
                 genesPool.remove(point)
@@ -205,7 +178,7 @@ class Example {
             }
 
             genes.add(0, 0)
-            genes.add(genes.size, points.size - 1)
+            genes.add(genes.size, graph.size - 1)
 
             Genotype(genes)
         }

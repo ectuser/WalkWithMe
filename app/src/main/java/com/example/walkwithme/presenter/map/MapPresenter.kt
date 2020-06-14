@@ -5,6 +5,7 @@ import android.location.LocationManager
 import android.widget.Toast
 import com.example.walkwithme.MapViewInterface
 import com.example.walkwithme.R
+import com.example.walkwithme.model.genetic.Algorithms
 import org.osmdroid.bonuspack.routing.MapQuestRoadManager
 import org.osmdroid.bonuspack.routing.RoadManager
 import org.osmdroid.events.MapEventsReceiver
@@ -62,8 +63,11 @@ class MapPresenter(private var mapInterface: MapViewInterface) {
             for (j in i + 1 until wayPoints.size) {
                 val roadFragment = roadManager.getRoad(arrayListOf(wayPoints[i], wayPoints[j]))
                 distance[i][j] = roadFragment.mLength
+                distance[j][i] = roadFragment.mLength
             }
         }
+
+        Algorithms.runGenetic(distance, 1488.0)
 
         map.invalidate()
     }
