@@ -1,4 +1,4 @@
-package com.example.walkwithme.algorithms.genetic
+package com.example.walkwithme.model.genetic
 
 import kotlin.math.abs
 import kotlin.math.max

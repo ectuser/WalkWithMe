@@ -1,4 +1,4 @@
-package com.example.walkwithme.algorithms.genetic
+package com.example.walkwithme.model.genetic
 
 class Generation<T, V>(
     private val fitness: (Genotype<T, V>) -> Genotype<T, V>,
