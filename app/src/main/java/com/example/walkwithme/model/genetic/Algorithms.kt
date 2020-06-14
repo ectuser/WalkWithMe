@@ -79,12 +79,14 @@ object Algorithms {
             val pAdd = 0.25
             val pRemove = 0.25
             val pSwap = 0.25
+            val iMax = genotype.genes.size
 
             var add = Random.randDouble() < pAdd && genesPool.isNotEmpty()
             var remove = Random.randDouble() < pRemove && genes.size > 2
             var swap = Random.randDouble() < pSwap && genes.size > 3
+            var i = 0
 
-            while (add || remove || swap) {
+            while ((add || remove || swap) && i < iMax) {
                 if (add) {
                     val genesInd = Random.randInt(1, genes.size - 1)
                     val poolInd = Random.randInt(0, genesPool.size - 1)
@@ -114,6 +116,7 @@ object Algorithms {
                 add = Random.randDouble() < pAdd && genesPool.isNotEmpty()
                 remove = Random.randDouble() < pRemove && genes.size > 2
                 swap = Random.randDouble() < pSwap && genes.size > 3
+                ++i
             }
 
             Genotype(genes)
@@ -161,7 +164,7 @@ object Algorithms {
             selected
         }
 
-        return genetic.run(512, 2048) {
+        return genetic.run(128, 512) {
             val genes = arrayListOf<Int>()
             val genesPool = arrayListOf<Int>()
             val probability = 1 - 2 / (graph.size - 2)
