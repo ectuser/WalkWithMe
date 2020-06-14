@@ -50,7 +50,7 @@ class Generation<T, V>(
         if (genotypeA.fitness != null && genotypeB.fitness == null) { return genotypeA }
         if (genotypeA.fitness == null && genotypeB.fitness != null) { return genotypeB }
 
-        return bestOfWrapper(genotypeA, genotypeB)
+        return bestOf(genotypeA, genotypeB)
     }
 
     private fun crossoverStage() {
