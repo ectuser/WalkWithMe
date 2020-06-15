@@ -89,7 +89,7 @@ object Algorithms {
             while ((add || remove || swap) && i < iMax) {
                 if (add) {
                     val genesInd = Random.randInt(1, genes.size - 1)
-                    val poolInd = Random.randInt(0, genesPool.size - 1)
+                    val poolInd = Random.randInt(0, genesPool.size)
 
                     genes.add(genesInd, genesPool[poolInd])
                     genesPool.removeAt(poolInd)
@@ -124,15 +124,19 @@ object Algorithms {
 
         genetic.setSelectToCrossover { genotypes, generationSize ->
             val selected = arrayListOf<Pair<Genotype<Int, Double>, Genotype<Int, Double>>>()
+            val genotypesPool = ArrayList(genotypes)
 
             while (genotypes.size < generationSize / 2) {
                 val l = Random.randInt(0, genotypes.size)
                 val r = Random.randInt(0, genotypes.size)
-                if (l != r &&
-                    !selected.contains(Pair(genotypes[l], genotypes[r]))
-                ) {
-                    selected.add(Pair(genotypes[l], genotypes[r]))
-                }
+
+                val genotypeA = genotypesPool.random()
+                genotypesPool.remove(genotypeA)
+
+                val genotypeB = genotypesPool.random()
+                genotypesPool.remove(genotypeB)
+
+                selected.add(Pair(genotypeA, genotypeB))
             }
 
             selected
@@ -140,12 +144,13 @@ object Algorithms {
 
         genetic.setSelectToMutation { genotypes, generationSize ->
             val selected = arrayListOf<Genotype<Int, Double>>()
+            val genotypesPool = ArrayList(genotypes)
 
             while (selected.size < generationSize / 4) {
-                val i = Random.randInt(0, genotypes.size)
-                if (!selected.contains(genotypes[i])) {
-                    selected.add(genotypes[i])
-                }
+                val genotype = genotypesPool.random()
+
+                selected.add(genotype)
+                genotypesPool.remove(genotype)
             }
 
             selected
@@ -153,12 +158,13 @@ object Algorithms {
 
         genetic.setSelectToSelection { genotypes, generationSize ->
             val selected = arrayListOf<Genotype<Int, Double>>()
+            val genotypesPool = ArrayList(genotypes)
 
             while (selected.size < generationSize) {
-                val genotype = Random.randBy(genotypes) { it.fitness!! }
-                if (!selected.contains(genotype)) {
-                    selected.add(genotype)
-                }
+                val genotype = Random.randBy(genotypesPool) { it.fitness!! }
+
+                selected.add(genotype)
+                genotypesPool.remove(genotype)
             }
 
             selected
