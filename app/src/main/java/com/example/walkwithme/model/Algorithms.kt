@@ -6,7 +6,6 @@ import com.example.walkwithme.model.utilities.Random
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.sqrt
 
 object Algorithms {
     fun runGenetic(
@@ -20,17 +19,17 @@ object Algorithms {
                 return@setFitness genotype
             }
 
-            var l = 0.0
+            var len = 0.0
             (0 until genotype.genes.size - 1).forEach {
                 val a = genotype.genes[it + 0]
                 val b = genotype.genes[it + 1]
 
-                l += graph[a][b]
+                len += graph[a][b]
             }
 
-            val w = graph.size
-            val dl = abs(l - length)
-            val fitness = w / sqrt(dl)
+            val w = graph.size.toDouble()
+            val l = 1.0 + abs(len - length) / length
+            val fitness = (w * w * w * w) / (l * l * l * l)
 
             Genotype(
                 genotype.genes,
