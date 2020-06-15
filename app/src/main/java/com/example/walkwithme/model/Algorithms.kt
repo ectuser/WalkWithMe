@@ -3,16 +3,16 @@ package com.example.walkwithme.model
 import com.example.walkwithme.model.genetic.Genetic
 import com.example.walkwithme.model.genetic.Genotype
 import com.example.walkwithme.model.utilities.Random
-import java.lang.Exception
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.sqrt
 
 object Algorithms {
     fun runGenetic(
         graph: Array<Array<Double>>,
         length: Double
-    ): Genotype<Int, Double> {
+    ): List<Int> {
         val genetic = Genetic<Int, Double>()
 
         genetic.setFitness { genotype ->
@@ -30,7 +30,8 @@ object Algorithms {
 
             val w = graph.size
             val dl = abs(l - length)
-            val fitness = w / (dl * dl)
+            val fitness = w / sqrt(dl)
+
             Genotype(
                 genotype.genes,
                 fitness
@@ -84,7 +85,7 @@ object Algorithms {
 
             val pAdd = 0.25
             val pRemove = 0.25
-            val pSwap = 0.25
+            val pSwap = 0.75
             val iMax = genotype.genes.size
 
             var add = Random.randDouble() < pAdd && genesPool.isNotEmpty()
@@ -193,6 +194,6 @@ object Algorithms {
             genes.add(genes.size, graph.size - 1)
 
             Genotype(genes)
-        }
+        }.genes
     }
 }

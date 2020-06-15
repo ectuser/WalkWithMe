@@ -65,7 +65,7 @@ class MapPresenter(private var mapInterface: MapViewInterface) {
             }
         }
 
-        val path = Algorithms.runGenetic(distance, 1488.0)
+        val path = Algorithms.runGenetic(distance, 10.0)
 
         map.invalidate()
     }
