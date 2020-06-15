@@ -1,11 +1,9 @@
 package com.example.walkwithme.presenter.map
 
 import android.content.Context
-import android.location.LocationManager
-import android.widget.Toast
 import com.example.walkwithme.MapViewInterface
 import com.example.walkwithme.R
-import com.example.walkwithme.model.genetic.Algorithms
+import com.example.walkwithme.model.Algorithms
 import org.osmdroid.bonuspack.routing.MapQuestRoadManager
 import org.osmdroid.bonuspack.routing.RoadManager
 import org.osmdroid.events.MapEventsReceiver

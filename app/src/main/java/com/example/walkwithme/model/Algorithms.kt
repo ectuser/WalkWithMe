@@ -1,5 +1,7 @@
-package com.example.walkwithme.model.genetic
+package com.example.walkwithme.model
 
+import com.example.walkwithme.model.genetic.Genetic
+import com.example.walkwithme.model.genetic.Genotype
 import com.example.walkwithme.model.utilities.Random
 import kotlin.math.abs
 import kotlin.math.max
@@ -28,7 +30,10 @@ object Algorithms {
             val w = graph.size
             val dl = abs(l - length)
             val fitness = w / (dl * dl)
-            Genotype(genotype.genes, fitness)
+            Genotype(
+                genotype.genes,
+                fitness
+            )
         }
 
         genetic.setBestOf { genotypeA, genotypeB ->
