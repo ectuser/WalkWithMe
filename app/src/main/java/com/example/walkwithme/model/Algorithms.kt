@@ -3,6 +3,7 @@ package com.example.walkwithme.model
 import com.example.walkwithme.model.genetic.Genetic
 import com.example.walkwithme.model.genetic.Genotype
 import com.example.walkwithme.model.utilities.Random
+import java.lang.Exception
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -76,9 +77,9 @@ object Algorithms {
                 genesPool.add(i)
             }
 
-            for (i in genotype.genes.indices) {
-                genes.add(genotype.genes[i])
-                genesPool.remove(genotype.genes[i])
+            genotype.genes.forEach { gene ->
+                genes.add(gene)
+                genesPool.remove(gene)
             }
 
             val pAdd = 0.25
@@ -93,7 +94,7 @@ object Algorithms {
 
             while ((add || remove || swap) && i < iMax) {
                 if (add) {
-                    val genesInd = Random.randInt(1, genes.size - 1)
+                    val genesInd = Random.randInt(1, genes.size)
                     val poolInd = Random.randInt(0, genesPool.size)
 
                     genes.add(genesInd, genesPool[poolInd])
@@ -103,7 +104,7 @@ object Algorithms {
                     val genesInd = Random.randInt(1, genes.size - 1)
 
                     genesPool.add(genes[genesInd])
-                    genes.remove(genesInd)
+                    genes.removeAt(genesInd)
                 }
                 if (swap) {
                     val li = Random.randInt(1, genes.size - 1)
@@ -132,9 +133,6 @@ object Algorithms {
             val genotypesPool = ArrayList(genotypes)
 
             while (genotypes.size < generationSize / 2) {
-                val l = Random.randInt(0, genotypes.size)
-                val r = Random.randInt(0, genotypes.size)
-
                 val genotypeA = genotypesPool.random()
                 genotypesPool.remove(genotypeA)
 
@@ -178,12 +176,12 @@ object Algorithms {
         return genetic.run(128, 512) {
             val genes = arrayListOf<Int>()
             val genesPool = arrayListOf<Int>()
-            val probability = 1 - 2 / (graph.size - 2)
 
-            (1 until graph.size - 1).forEach {
-                genesPool.add(it)
+            (1 until graph.size - 1).forEach { i ->
+                genesPool.add(i)
             }
 
+            val probability = 1.0 - 2.0 / (genesPool.size + 2)
             while (genesPool.isNotEmpty() && Random.randDouble() < probability) {
                 val point = genesPool.random()
 
