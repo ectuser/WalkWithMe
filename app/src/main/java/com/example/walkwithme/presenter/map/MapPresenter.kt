@@ -51,10 +51,6 @@ class MapPresenter(private var mapInterface: MapViewInterface) {
         val roadManager: RoadManager = MapQuestRoadManager("sudOFI4elaABURi9uNTp74tdaN3scVcb")
         roadManager.addRequestOption("routeType=pedestrian")
 
-        val road = roadManager.getRoad(wayPoints)
-        val roadOverlay = RoadManager.buildRoadOverlay(road)
-        map!!.overlays.add(roadOverlay)
-
         val distance = Array(wayPoints.size) { Array(wayPoints.size) { 0.0 } }
 
         for (i in 0 until wayPoints.size - 1) {
@@ -66,6 +62,15 @@ class MapPresenter(private var mapInterface: MapViewInterface) {
         }
 
         val path = Algorithms.runGenetic(distance, 10.0)
+        val newWayPoints = ArrayList<GeoPoint>()
+
+        for (i in path) {
+            newWayPoints.add(wayPoints[i])
+        }
+
+        val road = roadManager.getRoad(newWayPoints)
+        val roadOverlay = RoadManager.buildRoadOverlay(road)
+        map!!.overlays.add(roadOverlay)
 
         map.invalidate()
     }
