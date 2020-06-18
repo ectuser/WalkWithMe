@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity(), MapViewInterface {
         Configuration.getInstance().userAgentValue = "OBP_Tuto/1.0"
 
 
-        // I NEED THIS DO NOT REMOVE THE CODE BELOW // don't shout at me, calm down... // piss off
+        // I NEED THIS DO NOT REMOVE THE CODE BELOW // don't shout at me, calm down... // piss off // oh shut up
         val ctx = applicationContext
         Configuration.getInstance()
             .load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx))
@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity(), MapViewInterface {
         map!!.setTileSource(TileSourceFactory.MAPNIK)
         requestPermissionsIfNecessary(
             arrayOf( // if you need to show the current location, uncomment the line below
-                // Manifest.permission.ACCESS_FINE_LOCATION,
+                 Manifest.permission.ACCESS_FINE_LOCATION,
                 // WRITE_EXTERNAL_STORAGE is required in order to show the map
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Manifest.permission.ACCESS_FINE_LOCATION,
@@ -79,7 +79,8 @@ class MainActivity : AppCompatActivity(), MapViewInterface {
         addRotation()
         getMyLocation(this)
         BuildRouteButton.setOnClickListener {mapPresenter.buildRoute()}
-
+        MyLocationButton.setOnClickListener {mapPresenter.getMyLocation(this)}
+        CompassButton.setOnClickListener {mapPresenter.setDefaultRotation()}
 
     }
 
