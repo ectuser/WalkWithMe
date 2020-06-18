@@ -1,6 +1,9 @@
 package com.example.walkwithme.presenter.map
 
 import android.content.Context
+import android.location.LocationManager
+import android.os.SystemClock
+import android.widget.Toast
 import com.example.walkwithme.MapViewInterface
 import com.example.walkwithme.R
 import com.example.walkwithme.model.Algorithms
@@ -15,6 +18,7 @@ import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import java.util.ArrayList
+import java.util.concurrent.TimeUnit
 
 class MapPresenter(private var mapInterface: MapViewInterface) {
     private val context: Context = mapInterface as Context
@@ -115,6 +119,6 @@ class MapPresenter(private var mapInterface: MapViewInterface) {
     }
 
     fun setDefaultRotation() {
-        map?.mapOrientation = 0f;
+        map?.controller?.animateTo(map.mapCenter, map.zoomLevelDouble, 1000, 0f)
     }
 }
