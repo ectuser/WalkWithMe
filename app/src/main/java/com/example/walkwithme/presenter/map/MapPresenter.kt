@@ -1,22 +1,24 @@
 package com.example.walkwithme.presenter.map
 
 import android.content.Context
+import android.widget.Toast
 import com.example.walkwithme.MapViewInterface
 import com.example.walkwithme.R
 import com.example.walkwithme.model.Algorithms
-import com.google.android.gms.maps.CameraUpdateFactory
+import org.osmdroid.bonuspack.location.NominatimPOIProvider
 import org.osmdroid.bonuspack.routing.MapQuestRoadManager
 import org.osmdroid.bonuspack.routing.RoadManager
 import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.FolderOverlay
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
-import java.util.*
+import kotlin.collections.ArrayList
 
 
 class MapPresenter(private var mapInterface: MapViewInterface) {
@@ -95,6 +97,25 @@ class MapPresenter(private var mapInterface: MapViewInterface) {
         val road = roadManager.getRoad(newWayPoints)
         roadOverlay = RoadManager.buildRoadOverlay(road)
         map!!.overlays.add(roadOverlay)
+
+        val poiProvider = NominatimPOIProvider("OSMBonusPackTutoUserAgent")
+        val pointsOfInterest = poiProvider.getPOIAlong(road.routeLow, "cafe", 50, 80.0)
+
+        val toast = Toast.makeText(context, road.routeLow.toString(), Toast.LENGTH_LONG)
+        toast.show()
+
+        val poiMarkers = FolderOverlay(context)
+        map!!.overlays.add(poiMarkers)
+
+        for (poi in pointsOfInterest) {
+            val poiMarker =
+                Marker(map)
+            poiMarker.title = poi.mType
+            poiMarker.snippet = poi.mDescription
+            poiMarker.position = poi.mLocation
+
+            poiMarkers.add(poiMarker)
+        }
 
         map.invalidate()
     }
