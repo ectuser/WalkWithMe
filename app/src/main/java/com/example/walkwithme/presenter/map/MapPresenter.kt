@@ -28,25 +28,32 @@ class MapPresenter(private var mapInterface: MapViewInterface) {
     private var wayPoints = ArrayList<GeoPoint>()
     private lateinit var roadOverlay: Polyline
 
-    fun setMarker(latitude: Double, longitude: Double, index: Int) {
+    fun setMarker(latitude: Double, longitude: Double, index: Int? = null) {
         val point = GeoPoint(latitude, longitude)
         val marker = Marker(map)
         marker.position = point
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-        marker.icon = context.resources.getDrawable(R.drawable.marker)
-        marker.isDraggable = true
 
-        marker.setOnMarkerDragListener(object : Marker.OnMarkerDragListener {
-            override fun onMarkerDrag(marker: Marker) {
-            }
+        if (index != null) {
+            marker.isDraggable = true
 
-            override fun onMarkerDragStart(marker: Marker) {
-            }
+            marker.setOnMarkerDragListener(object : Marker.OnMarkerDragListener {
+                override fun onMarkerDrag(marker: Marker) {
+                }
 
-            override fun onMarkerDragEnd(marker: Marker) {
-                wayPoints[index] = marker.position
-            }
-        })
+                override fun onMarkerDragStart(marker: Marker) {
+                }
+
+                override fun onMarkerDragEnd(marker: Marker) {
+                    wayPoints[index] = marker.position
+                }
+            })
+
+            marker.icon = context.resources.getDrawable(R.drawable.marker)
+        }
+        else {
+            marker.icon = context.resources.getDrawable(R.drawable.marker_poi)
+        }
 
         map!!.overlays.add(marker)
         map.invalidate()
@@ -77,6 +84,35 @@ class MapPresenter(private var mapInterface: MapViewInterface) {
 
         val roadManager: RoadManager = MapQuestRoadManager("sudOFI4elaABURi9uNTp74tdaN3scVcb")
         roadManager.addRequestOption("routeType=pedestrian")
+        var road = roadManager.getRoad(wayPoints)
+
+        // filtering route points to have less of them
+
+        val filteredRoute = ArrayList<GeoPoint>()
+
+        for (i in 0 until road.mRouteHigh.size) {
+            if (i % 10 == 0) {
+                filteredRoute.add(road.mRouteHigh[i])
+            }
+        }
+
+        // getting POIs near every route point
+
+        val poiProvider = NominatimPOIProvider("OSMBonusPackTutoUserAgent")
+        val pointsOfInterest = ArrayList<POI>()
+
+        for (i in 0 until filteredRoute.size) {
+            pointsOfInterest.addAll(poiProvider.getPOICloseTo(filteredRoute[i], "cafe", 1, road.mLength * 0.001))
+        }
+
+        for (i in 0 until pointsOfInterest.size) {
+            wayPoints.add(1, pointsOfInterest[i].mLocation)
+        }
+
+//        var toast = Toast.makeText(context, wayPoints.toString().subSequence(0, 5), Toast.LENGTH_LONG)
+//        toast.show()
+
+        // getting distances for genetic algorithm
 
         val distance = Array(wayPoints.size) { Array(wayPoints.size) { 0.0 } }
 
@@ -91,50 +127,19 @@ class MapPresenter(private var mapInterface: MapViewInterface) {
         val path = Algorithms.runGenetic(distance, 10.0)
         val newWayPoints = ArrayList<GeoPoint>()
 
-        for (i in path) {
+        for (i in path.indices) {
             newWayPoints.add(wayPoints[i])
-        }
 
-        val road = roadManager.getRoad(newWayPoints)
-        roadOverlay = RoadManager.buildRoadOverlay(road)
-        map!!.overlays.add(roadOverlay)
-
-        // filtering route points to have less of them
-
-        val filteredRoute = ArrayList<GeoPoint>()
-
-        for (i in 0 until road.mRouteHigh.size) {
-            if (i % 16 == 0) {
-                filteredRoute.add(road.mRouteHigh[i])
+            if (i != 0 && i != path.size - 1) {
+                setMarker(wayPoints[i].latitude, wayPoints[i].longitude)
             }
         }
 
-        // getting POIs near every route point
-
-        val poiProvider = NominatimPOIProvider("OSMBonusPackTutoUserAgent")
-        val pointsOfInterest = ArrayList<POI>()
-
-        for (i in 0 until filteredRoute.size) {
-            pointsOfInterest.addAll(poiProvider.getPOICloseTo(filteredRoute[i], "cafe", 10, 0.01))
-        }
-
-        val poiMarkers = FolderOverlay(context)
-        map.overlays.add(poiMarkers)
-
-        for (poi in pointsOfInterest) {
-            val poiMarker =
-                Marker(map)
-            poiMarker.title = poi.mType
-            poiMarker.snippet = poi.mDescription
-            poiMarker.position = poi.mLocation
-
-            poiMarkers.add(poiMarker)
-        }
+        road = roadManager.getRoad(newWayPoints)
+        roadOverlay = RoadManager.buildRoadOverlay(road)
+        map!!.overlays.add(roadOverlay)
 
         map.invalidate()
-
-//        val toast = Toast.makeText(context, filteredRoute.toString(), Toast.LENGTH_LONG)
-//        toast.show()
     }
 
     fun addRotation() {
