@@ -2,16 +2,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/action_explore"
+        android:enabled="true"
+        android:icon="@drawable/action_explore"
+        android:title="@string/action_explore"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/challenges"
         android:enabled="true"
         android:icon="@drawable/action_challenges"
         android:title="@string/action_challenges"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/action_explore"
+        android:id="@+id/action_stats"
         android:enabled="true"
-        android:icon="@drawable/action_explore"
-        android:title="@string/action_explore"
+        android:icon="@drawable/action_stats"
+        android:title="@string/action_stats"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_settings"
