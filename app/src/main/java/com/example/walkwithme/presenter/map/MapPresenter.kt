@@ -1,12 +1,10 @@
 package com.example.walkwithme.presenter.map
 
 import android.content.Context
-import android.location.LocationManager
-import android.os.SystemClock
-import android.widget.Toast
 import com.example.walkwithme.MapViewInterface
 import com.example.walkwithme.R
 import com.example.walkwithme.model.Algorithms
+import com.google.android.gms.maps.CameraUpdateFactory
 import org.osmdroid.bonuspack.routing.MapQuestRoadManager
 import org.osmdroid.bonuspack.routing.RoadManager
 import org.osmdroid.events.MapEventsReceiver
@@ -14,33 +12,51 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
-import java.util.ArrayList
-import java.util.concurrent.TimeUnit
+import java.util.*
+
 
 class MapPresenter(private var mapInterface: MapViewInterface) {
     private val context: Context = mapInterface as Context
     private val map: MapView? = mapInterface.map
     private var wayPoints = ArrayList<GeoPoint>()
+    private lateinit var roadOverlay: Polyline
 
-    fun setMarker(latitude: Double, longitude: Double) {
-        val startPoint = GeoPoint(latitude, longitude)
-        val startMarker = Marker(map)
-        startMarker.position = startPoint
-        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-        startMarker.icon = context.resources.getDrawable(R.drawable.marker)
+    fun setMarker(latitude: Double, longitude: Double, index: Int) {
+        val point = GeoPoint(latitude, longitude)
+        val marker = Marker(map)
+        marker.position = point
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        marker.icon = context.resources.getDrawable(R.drawable.marker)
+        marker.isDraggable = true
 
-        map!!.overlays.add(startMarker)
+        marker.setOnMarkerDragListener(object : Marker.OnMarkerDragListener {
+            override fun onMarkerDrag(marker: Marker) {
+            }
+
+            override fun onMarkerDragStart(marker: Marker) {
+            }
+
+            override fun onMarkerDragEnd(marker: Marker) {
+                wayPoints[index] = marker.position
+            }
+        })
+
+        map!!.overlays.add(marker)
         map.invalidate()
     }
 
     fun onMapTapListener() {
         val mReceive: MapEventsReceiver = object : MapEventsReceiver {
             override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
-                setMarker(p.latitude, p.longitude)
-                wayPoints.add(p)
+                if (wayPoints.size < 2) {
+                    setMarker(p.latitude, p.longitude, wayPoints.size)
+                    wayPoints.add(p)
+                }
+
                 return false
             }
 
@@ -52,6 +68,10 @@ class MapPresenter(private var mapInterface: MapViewInterface) {
     }
 
     fun buildRoute() {
+        if (::roadOverlay.isInitialized) {
+            map!!.overlays.remove(roadOverlay)
+        }
+
         val roadManager: RoadManager = MapQuestRoadManager("sudOFI4elaABURi9uNTp74tdaN3scVcb")
         roadManager.addRequestOption("routeType=pedestrian")
 
@@ -73,7 +93,7 @@ class MapPresenter(private var mapInterface: MapViewInterface) {
         }
 
         val road = roadManager.getRoad(newWayPoints)
-        val roadOverlay = RoadManager.buildRoadOverlay(road)
+        roadOverlay = RoadManager.buildRoadOverlay(road)
         map!!.overlays.add(roadOverlay)
 
         map.invalidate()
