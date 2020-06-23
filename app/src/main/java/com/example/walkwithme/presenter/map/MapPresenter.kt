@@ -6,6 +6,7 @@ import com.example.walkwithme.MapViewInterface
 import com.example.walkwithme.R
 import com.example.walkwithme.model.Algorithms
 import org.osmdroid.bonuspack.location.NominatimPOIProvider
+import org.osmdroid.bonuspack.location.POI
 import org.osmdroid.bonuspack.routing.MapQuestRoadManager
 import org.osmdroid.bonuspack.routing.RoadManager
 import org.osmdroid.events.MapEventsReceiver
@@ -98,14 +99,27 @@ class MapPresenter(private var mapInterface: MapViewInterface) {
         roadOverlay = RoadManager.buildRoadOverlay(road)
         map!!.overlays.add(roadOverlay)
 
-        val poiProvider = NominatimPOIProvider("OSMBonusPackTutoUserAgent")
-        val pointsOfInterest = poiProvider.getPOIAlong(road.routeLow, "cafe", 50, 80.0)
+        // filtering route points to have less of them
 
-        val toast = Toast.makeText(context, road.routeLow.toString(), Toast.LENGTH_LONG)
-        toast.show()
+        val filteredRoute = ArrayList<GeoPoint>()
+
+        for (i in 0 until road.mRouteHigh.size) {
+            if (i % 16 == 0) {
+                filteredRoute.add(road.mRouteHigh[i])
+            }
+        }
+
+        // getting POIs near every route point
+
+        val poiProvider = NominatimPOIProvider("OSMBonusPackTutoUserAgent")
+        val pointsOfInterest = ArrayList<POI>()
+
+        for (i in 0 until filteredRoute.size) {
+            pointsOfInterest.addAll(poiProvider.getPOICloseTo(filteredRoute[i], "cafe", 10, 0.01))
+        }
 
         val poiMarkers = FolderOverlay(context)
-        map!!.overlays.add(poiMarkers)
+        map.overlays.add(poiMarkers)
 
         for (poi in pointsOfInterest) {
             val poiMarker =
@@ -118,6 +132,9 @@ class MapPresenter(private var mapInterface: MapViewInterface) {
         }
 
         map.invalidate()
+
+//        val toast = Toast.makeText(context, filteredRoute.toString(), Toast.LENGTH_LONG)
+//        toast.show()
     }
 
     fun addRotation() {
