@@ -1,15 +1,23 @@
 package com.example.walkwithme
 
-import android.content.Context
-import android.content.res.Resources
-import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
-import java.util.ArrayList
+import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.Overlay
+import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
 interface MapViewInterface {
-    var map: MapView?
 
-    fun onMapTapListener()
-    fun addRotation()
-    fun getMyLocation(context: Context)
+    fun getMap(): MapView
+    fun getMarker(): Marker
+    fun getRotationGestureOverlay(): RotationGestureOverlay
+    fun getMyLocationOverlay(): MyLocationNewOverlay
+
+    fun setMapMultiTouchControls(on: Boolean)
+
+    fun mapInvalidate()
+
+    fun mapAddOverlay(overlay: Overlay?)
+    fun mapRemoveOverlay(overlay: Overlay?)
+
 }
