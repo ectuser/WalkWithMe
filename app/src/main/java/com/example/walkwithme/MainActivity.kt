@@ -5,7 +5,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.StrictMode
-import androidx.preference.PreferenceManager
+import android.preference.PreferenceManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat

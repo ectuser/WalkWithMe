@@ -36,21 +36,25 @@ class MapPresenter(
         }
 
         val poiProvider = NominatimPOIProvider("OSMBonusPackTutoUserAgent")
-        val pois = ArrayList<POI>()
+        val pointsOfInterest = ArrayList<POI>()
 
         for (i in 0 until filteredRoute.size) {
-            pois.addAll(
+            pointsOfInterest.addAll(
                 poiProvider.getPOICloseTo(
                     filteredRoute[i],
                     "cafe",
-                    1,
+                    2,
                     road.mLength * 0.001
                 )
             )
         }
 
-        for (i in 0 until pois.size) {
-            wayPoints.add(1, pois[i].mLocation)
+        for (i in 0 until pointsOfInterest.size) {
+            val curPointOfInterest = pointsOfInterest[i].mLocation
+
+            if (curPointOfInterest !in wayPoints) {
+                wayPoints.add(1, curPointOfInterest)
+            }
         }
 
         val distance = Array(wayPoints.size) { Array(wayPoints.size) { 0.0 } }
@@ -72,14 +76,15 @@ class MapPresenter(
         val path = Algorithms.runGenetic(distance, 10.0)
         val newWayPoints = ArrayList<GeoPoint>()
 
-        for (i in path.indices) {
+        for (i in path) {
             newWayPoints.add(wayPoints[i])
 
-            if (i != 0 && i != path.size - 1) {
+            if (i != 0 && i != wayPoints.size - 1) {
                 setMarker(
                     createPOIMarker(
                         wayPoints[i].latitude,
-                        wayPoints[i].longitude
+                        wayPoints[i].longitude,
+                        path.indexOf(i)
                     )
                 )
             }
@@ -177,6 +182,14 @@ class MapPresenter(
                 mapInterface as Context,
                 R.drawable.marker
             )
+            when (index) {
+                1 -> {
+                    it.title = "Start"
+                }
+                2 -> {
+                    it.title = "Finish"
+                }
+            }
             it.setOnMarkerDragListener(
                 object : Marker.OnMarkerDragListener {
 
@@ -193,13 +206,15 @@ class MapPresenter(
 
     private fun createPOIMarker(
         latitude: Double,
-        longitude: Double
+        longitude: Double,
+        index: Int
     ): Marker {
         return createMarker(latitude, longitude).also {
             it.icon = ContextCompat.getDrawable(
                 mapInterface as Context,
                 R.drawable.marker_poi
             )
+            it.title = index.toString()
         }
     }
 }
