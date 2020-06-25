@@ -15,14 +15,19 @@ import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
 import kotlin.collections.ArrayList
+import kotlin.math.max
 
 class MapPresenter(
     private val mapInterface: MapViewInterface
 ) {
     private val wayPoints = ArrayList<GeoPoint>()
+    private val poiMarkers = ArrayList<Marker>()
     private var lastRoad: Polyline? = null
 
     fun buildRoute() {
+        for (marker in poiMarkers) {
+            mapInterface.getMap().overlays.remove(marker)
+        }
         mapInterface.mapRemoveOverlay(lastRoad)
 
         val roadManager = MapQuestRoadManager("sudOFI4elaABURi9uNTp74tdaN3scVcb").also {
@@ -31,7 +36,7 @@ class MapPresenter(
         val road = roadManager.getRoad(wayPoints)
         val filteredRoute = ArrayList<GeoPoint>()
 
-        for (i in 0 until road.mRouteHigh.size step road.mLength.toInt()) {
+        for (i in 0 until road.mRouteHigh.size step max(1, road.mLength.toInt())) {
             filteredRoute.add(road.mRouteHigh[i])
         }
 
@@ -90,6 +95,7 @@ class MapPresenter(
             }
         }
 
+        wayPoints.subList(1, wayPoints.size - 1).clear()
         lastRoad = RoadManager.buildRoadOverlay(
             roadManager.getRoad(newWayPoints)
         )
@@ -215,6 +221,7 @@ class MapPresenter(
                 R.drawable.marker_poi
             )
             it.title = index.toString()
+            poiMarkers.add(it)
         }
     }
 }
