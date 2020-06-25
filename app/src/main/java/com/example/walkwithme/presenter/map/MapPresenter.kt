@@ -31,7 +31,7 @@ class MapPresenter(
         val road = roadManager.getRoad(wayPoints)
         val filteredRoute = ArrayList<GeoPoint>()
 
-        for (i in 0 until road.mRouteHigh.size step 10) {
+        for (i in 0 until road.mRouteHigh.size step road.mLength.toInt()) {
             filteredRoute.add(road.mRouteHigh[i])
         }
 
@@ -43,7 +43,7 @@ class MapPresenter(
                 poiProvider.getPOICloseTo(
                     filteredRoute[i],
                     "cafe",
-                    2,
+                    1,
                     road.mLength * 0.001
                 )
             )
@@ -102,7 +102,6 @@ class MapPresenter(
 
             override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
                 if (wayPoints.size < 2) {
-                    wayPoints.add(p)
                     setMarker(
                         createPathMarker(
                             p.latitude,
@@ -110,6 +109,7 @@ class MapPresenter(
                             wayPoints.size
                         )
                     )
+                    wayPoints.add(p)
                 }
 
                 return false
@@ -183,10 +183,10 @@ class MapPresenter(
                 R.drawable.marker
             )
             when (index) {
-                1 -> {
+                0 -> {
                     it.title = "Start"
                 }
-                2 -> {
+                1 -> {
                     it.title = "Finish"
                 }
             }

@@ -173,7 +173,7 @@ object Algorithms {
             selected
         }
 
-        return genetic.run(128, 512) {
+        return genetic.run(128, 1024) {
             val genes = arrayListOf<Int>()
             val genesPool = arrayListOf<Int>()
 
