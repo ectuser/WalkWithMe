@@ -1,6 +1,7 @@
 package com.example.walkwithme.presenter.map
 
 import android.content.Context
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.example.walkwithme.MapViewInterface
 import com.example.walkwithme.R
@@ -44,14 +45,17 @@ class MapPresenter(
         val pointsOfInterest = ArrayList<POI>()
 
         for (i in 0 until filteredRoute.size) {
-            pointsOfInterest.addAll(
-                poiProvider.getPOICloseTo(
-                    filteredRoute[i],
-                    "cafe",
-                    1,
-                    road.mLength * 0.001
+            try {
+                pointsOfInterest.addAll(
+                    poiProvider.getPOICloseTo(
+                        filteredRoute[i],
+                        "cafe",
+                        1,
+                        road.mLength * 0.001
+                    )
                 )
-            )
+            } catch (e: Exception) {
+            }
         }
 
         for (i in 0 until pointsOfInterest.size) {
@@ -104,7 +108,7 @@ class MapPresenter(
     }
 
     fun setOnMapTapListener() {
-        val mReceiver = object: MapEventsReceiver {
+        val mReceiver = object : MapEventsReceiver {
 
             override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
                 if (wayPoints.size < 2) {
@@ -199,8 +203,8 @@ class MapPresenter(
             it.setOnMarkerDragListener(
                 object : Marker.OnMarkerDragListener {
 
-                    override fun onMarkerDrag(marker: Marker) { }
-                    override fun onMarkerDragStart(marker: Marker) { }
+                    override fun onMarkerDrag(marker: Marker) {}
+                    override fun onMarkerDragStart(marker: Marker) {}
                     override fun onMarkerDragEnd(marker: Marker) {
                         wayPoints[index] = marker.position
                     }
