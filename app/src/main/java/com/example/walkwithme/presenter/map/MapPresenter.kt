@@ -101,7 +101,9 @@ class MapPresenter(
 
         wayPoints.subList(1, wayPoints.size - 1).clear()
         lastRoad = RoadManager.buildRoadOverlay(
-            roadManager.getRoad(newWayPoints)
+            roadManager.getRoad(newWayPoints),
+            0x7f338a3e,
+            7.5f
         )
         mapInterface.mapAddOverlay(lastRoad)
         mapInterface.mapInvalidate()
