@@ -29,7 +29,7 @@ object Algorithms {
 
             val w = graph.size.toDouble()
             val l = 1.0 + abs(len - length) / length
-            val fitness = (w * w * w * w) / (l * l * l * l)
+            val fitness = w / (l * l * l * l * l)
 
             Genotype(
                 genotype.genes,
@@ -82,10 +82,10 @@ object Algorithms {
                 genesPool.remove(gene)
             }
 
-            val pAdd = 0.25
-            val pRemove = 0.25
-            val pSwap = 0.75
-            val iMax = genotype.genes.size
+            val pAdd = 0.3
+            val pRemove = 0.3
+            val pSwap = 0.8
+            val iMax = genotype.genes.size * 2
 
             var add = Random.randDouble() < pAdd && genesPool.isNotEmpty()
             var remove = Random.randDouble() < pRemove && genes.size > 2
@@ -173,7 +173,7 @@ object Algorithms {
             selected
         }
 
-        return genetic.run(128, 1024) {
+        return genetic.run(128, 512) {
             val genes = arrayListOf<Int>()
             val genesPool = arrayListOf<Int>()
 
