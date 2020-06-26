@@ -82,7 +82,7 @@ class MapPresenter(
             }
         }
 
-        val path = Algorithms.runGenetic(distance, 10.0)
+        val path = Algorithms.runGenetic(distance, road.mLength * 1.2)
         val newWayPoints = ArrayList<GeoPoint>()
 
         for (i in path) {
