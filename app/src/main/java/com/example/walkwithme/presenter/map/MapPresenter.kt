@@ -3,6 +3,7 @@ package com.example.walkwithme.presenter.map
 import android.content.Context
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import com.example.walkwithme.MainActivity
 import com.example.walkwithme.MapViewInterface
 import com.example.walkwithme.R
 import com.example.walkwithme.fragments.MapFragment
@@ -192,7 +193,7 @@ class MapPresenter(
         return createMarker(latitude, longitude).also {
             it.isDraggable = true
             it.icon = ContextCompat.getDrawable(
-                mapInterface as Context,
+                mapInterface.getMap().context,
                 R.drawable.marker
             )
             when (index) {
@@ -224,7 +225,7 @@ class MapPresenter(
     ): Marker {
         return createMarker(latitude, longitude).also {
             it.icon = ContextCompat.getDrawable(
-                mapInterface as Context,
+                mapInterface.getMap().context,
                 R.drawable.marker_poi
             )
             it.title = index.toString()

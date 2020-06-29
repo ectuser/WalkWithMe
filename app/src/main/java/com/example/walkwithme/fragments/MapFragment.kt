@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.example.walkwithme.MainActivity
 import com.example.walkwithme.MapViewInterface
 import com.example.walkwithme.R
 import com.example.walkwithme.presenter.map.MapPresenter
@@ -70,10 +71,6 @@ class MapFragment : Fragment(), MapViewInterface {
     override fun onPause() {
         super.onPause()
         Map.onPause()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
     }
 
     override fun getMap(): MapView {
