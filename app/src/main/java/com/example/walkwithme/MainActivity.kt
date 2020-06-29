@@ -1,6 +1,5 @@
 package com.example.walkwithme
 
-import com.example.walkwithme.presenter.map.MapPresenter
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -9,25 +8,20 @@ import android.preference.PreferenceManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import com.example.walkwithme.fragments.ChallengesFragment
+import com.example.walkwithme.fragments.MapFragment
+import com.example.walkwithme.fragments.SettingsFragment
+import com.example.walkwithme.fragments.StatsFragment
+import com.example.walkwithme.presenter.map.MapPresenter
 import kotlinx.android.synthetic.main.activity_main.*
 import org.osmdroid.config.Configuration
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.CustomZoomButtonsController
-import org.osmdroid.views.MapView
-import org.osmdroid.views.overlay.Marker
-import org.osmdroid.views.overlay.Overlay
-import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
-import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import java.util.*
 
-class MainActivity:
-    AppCompatActivity(),
-    MapViewInterface {
+class MainActivity :
+    AppCompatActivity() {
 
     private val permissionRequestCode = 1
-    private var mapPresenter: MapPresenter? = null
 
     public override fun onCreate(
         savedInstanceState: Bundle?
@@ -40,6 +34,29 @@ class MainActivity:
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        loadFragment(MapFragment())
+
+        NavigationView.setOnNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.action_map -> {
+                    loadFragment(MapFragment())
+                    return@setOnNavigationItemSelectedListener true
+                }
+                R.id.action_challenges -> {
+                    loadFragment(ChallengesFragment())
+                    return@setOnNavigationItemSelectedListener true
+                }
+                R.id.action_stats -> {
+                    loadFragment(StatsFragment())
+                    return@setOnNavigationItemSelectedListener true
+                }
+                R.id.action_settings -> {
+                    loadFragment(SettingsFragment())
+                    return@setOnNavigationItemSelectedListener true
+                }
+            }
+            false
+        }
 
         Configuration.getInstance().apply {
             userAgentValue = "OBP_Tuto/1.0"
@@ -59,91 +76,13 @@ class MainActivity:
                 Manifest.permission.ACCESS_COARSE_LOCATION
             )
         )
-
-        Map.apply {
-            setTileSource(TileSourceFactory.MAPNIK)
-            setMultiTouchControls(true)
-            zoomController.setVisibility(
-                CustomZoomButtonsController.Visibility.NEVER
-            )
-            controller.setZoom(12.0)
-            controller.setCenter(
-                GeoPoint(
-                    56.4977,
-                    84.9744
-                )
-            )
-        }
-
-        mapPresenter = MapPresenter(this).apply {
-            setOnMapTapListener()
-            setRotationGestureOverlay()
-            setMyLocationOverlay()
-        }
-
-        BuildRouteButton.setOnClickListener { mapPresenter?.buildRoute() }
-        MyLocationButton.setOnClickListener { mapPresenter?.setMyLocationOverlay() }
-        CompassButton.setOnClickListener { mapPresenter?.setDefaultRotation() }
     }
 
-    override fun onResume() {
-        super.onResume()
-        Map.onResume()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        Map.onPause()
-    }
-
-    override fun onDestroy() {
-        mapPresenter = null
-        super.onDestroy()
-    }
-
-    override fun getMap(): MapView {
-        return Map
-    }
-
-    override fun getMarker(): Marker {
-        return Marker(Map)
-    }
-
-    override fun getRotationGestureOverlay(): RotationGestureOverlay {
-        return RotationGestureOverlay(Map)
-    }
-
-    override fun getMyLocationOverlay(): MyLocationNewOverlay {
-        return MyLocationNewOverlay(
-            GpsMyLocationProvider(this),
-            Map
-        )
-    }
-
-    override fun setMapMultiTouchControls(
-        on: Boolean
-    ) {
-        Map.setMultiTouchControls(on)
-    }
-
-    override fun mapInvalidate() {
-        Map.invalidate()
-    }
-
-    override fun mapAddOverlay(
-        overlay: Overlay?
-    ) {
-        if (overlay != null) {
-            Map.overlays.add(overlay)
-        }
-    }
-
-    override fun mapRemoveOverlay(
-        overlay: Overlay?
-    ) {
-        if (overlay != null) {
-            Map.overlays.remove(overlay)
-        }
+    private fun loadFragment(fragment: Fragment) {
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.Container, fragment)
+        transaction.addToBackStack(null)
+        transaction.commit()
     }
 
     private fun requestPermissionsIfNecessary(
