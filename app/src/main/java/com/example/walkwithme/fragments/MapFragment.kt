@@ -6,10 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.example.walkwithme.MainActivity
 import com.example.walkwithme.MapViewInterface
 import com.example.walkwithme.R
 import com.example.walkwithme.presenter.map.MapPresenter
-import kotlinx.android.synthetic.main.activity_map.*
 import kotlinx.android.synthetic.main.fragment_map.*
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -70,10 +70,6 @@ class MapFragment : Fragment(), MapViewInterface {
     override fun onPause() {
         super.onPause()
         Map.onPause()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
     }
 
     override fun getMap(): MapView {

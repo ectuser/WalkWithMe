@@ -11,9 +11,10 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.walkwithme.fragments.ChallengesFragment
 import com.example.walkwithme.fragments.MapFragment
+import com.example.walkwithme.fragments.SettingsFragment
+import com.example.walkwithme.fragments.StatsFragment
 import com.example.walkwithme.presenter.map.MapPresenter
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_map.*
 import org.osmdroid.config.Configuration
 import java.util.*
 
@@ -43,6 +44,14 @@ class MainActivity :
                 }
                 R.id.action_challenges -> {
                     loadFragment(ChallengesFragment())
+                    return@setOnNavigationItemSelectedListener true
+                }
+                R.id.action_stats -> {
+                    loadFragment(StatsFragment())
+                    return@setOnNavigationItemSelectedListener true
+                }
+                R.id.action_settings -> {
+                    loadFragment(SettingsFragment())
                     return@setOnNavigationItemSelectedListener true
                 }
             }
