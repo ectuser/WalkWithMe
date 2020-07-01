@@ -6,21 +6,35 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <TextView
+        android:id="@+id/RouteTypeTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/text_route_type"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <SeekBar
         android:id="@+id/InterestSeekBar"
         style="@style/Widget.AppCompat.SeekBar.Discrete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
+        android:background="@null"
         android:max="8"
         android:progress="4"
-        android:progressTint="@color/colorBasic"
+        android:progressDrawable="@drawable/interest_seek_bar_progress"
+        android:thumb="@drawable/interest_seek_bar_thumb"
         android:thumbTint="@color/colorBasic"
         app:layout_constraintEnd_toStartOf="@+id/MoreInterestingTextView"
         app:layout_constraintStart_toEndOf="@+id/QuickerTextView"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/RouteTypeTextView"
+        app:tickMark="@android:color/transparent" />
 
     <TextView
         android:id="@+id/QuickerTextView"
@@ -45,12 +59,23 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/InterestSeekBar" />
 
+    <TextView
+        android:id="@+id/CategoryRankingTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="64dp"
+        android:text="@string/text_category_ranking"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/InterestSeekBar" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/CategoryRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="80dp"
         android:overScrollMode="never"
@@ -59,6 +84,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/InterestSeekBar" />
+        app:layout_constraintTop_toBottomOf="@+id/CategoryRankingTextView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

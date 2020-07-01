@@ -6,4 +6,6 @@
     <string name="action_stats">Stats</string>
     <string name="text_quicker">Quicker</string>
     <string name="text_more_interesting">More interesting</string>
+    <string name="text_route_type">Route type</string>
+    <string name="text_category_ranking">Category ranking</string>
 </resources>

@@ -26,11 +26,14 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val numberOfCategories = 6
         val names = arrayListOf("Cafe", "Church", "Fountain", "Museum", "Park", "Supermarket")
-        val images = ArrayList<Drawable>()
-
-        for (i in 0 until numberOfCategories) {
-            images.add(ContextCompat.getDrawable(requireContext(), R.drawable.category_0)!!)
-        }
+        val images = arrayListOf(
+            ContextCompat.getDrawable(requireContext(), R.drawable.category_cafe)!!,
+            ContextCompat.getDrawable(requireContext(), R.drawable.category_church)!!,
+            ContextCompat.getDrawable(requireContext(), R.drawable.category_fountain)!!,
+            ContextCompat.getDrawable(requireContext(), R.drawable.category_museum)!!,
+            ContextCompat.getDrawable(requireContext(), R.drawable.category_park)!!,
+            ContextCompat.getDrawable(requireContext(), R.drawable.category_supermarket)!!
+        )
 
         val categoryView = CategoryRecyclerView
         categoryView.layoutManager =
