@@ -8,14 +8,14 @@
 
     <SeekBar
         android:id="@+id/InterestSeekBar"
-        style="@android:style/Widget.Material.SeekBar.Discrete"
+        style="@style/Widget.AppCompat.SeekBar.Discrete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="16dp"
-        android:max="10"
-        android:progress="1"
+        android:max="8"
+        android:progress="5"
         android:progressTint="@color/colorBasic"
         android:thumbTint="@color/colorBasic"
         app:layout_constraintEnd_toStartOf="@+id/MoreInterestingTextView"
@@ -43,6 +43,21 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/InterestSeekBar" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/CategoryRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="64dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="80dp"
+        android:scrollbars="none"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/InterestSeekBar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
