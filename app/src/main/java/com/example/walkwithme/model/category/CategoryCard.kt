@@ -1,3 +1,5 @@
 package com.example.walkwithme.model.category
 
-data class CategoryCard(val name: String = "")
+import android.graphics.drawable.Drawable
+
+data class CategoryCard(val number: Int, val name: String, val image: Drawable)
