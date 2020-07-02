@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -23,52 +22,64 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
         android:background="@null"
-        android:max="8"
-        android:progress="4"
+        android:max="6"
+        android:progress="3"
         android:progressDrawable="@drawable/interest_seek_bar_progress"
         android:thumb="@drawable/interest_seek_bar_thumb"
         android:thumbTint="@color/colorBasic"
-        app:layout_constraintEnd_toStartOf="@+id/MoreInterestingTextView"
-        app:layout_constraintStart_toEndOf="@+id/QuickerTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/RouteTypeTextView"
         app:tickMark="@android:color/transparent" />
 
-    <TextView
-        android:id="@+id/QuickerTextView"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/InterestLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="@string/text_quicker"
-        android:textSize="14sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/InterestSeekBar" />
-
-    <TextView
-        android:id="@+id/MoreInterestingTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/text_more_interesting"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textSize="14sp"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/InterestSeekBar" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/InterestSeekBar">
+
+        <TextView
+            android:id="@+id/QuickerTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_weight="1"
+            android:gravity="start"
+            android:text="@string/text_quicker"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/MoreInterestingTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:text="@string/text_more_interesting"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textSize="14sp" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/CategoryRankingTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="32dp"
         android:text="@string/text_category_ranking"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/InterestSeekBar" />
+        app:layout_constraintTop_toBottomOf="@+id/InterestLayout" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/CategoryRecyclerView"
@@ -85,5 +96,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/CategoryRankingTextView" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
