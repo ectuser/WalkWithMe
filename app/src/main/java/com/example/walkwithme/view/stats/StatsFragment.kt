@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.walkwithme.R
 
-class StatsFragment : Fragment() {
+class StatsFragment : Fragment(), StatsViewInterface {
 
     override fun onCreateView(
         inflater: LayoutInflater,

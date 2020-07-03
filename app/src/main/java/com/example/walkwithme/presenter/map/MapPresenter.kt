@@ -1,7 +1,7 @@
 package com.example.walkwithme.presenter.map
 
 import androidx.core.content.ContextCompat
-import com.example.walkwithme.MapViewInterface
+import com.example.walkwithme.view.map.MapViewInterface
 import com.example.walkwithme.R
 import com.example.walkwithme.model.Algorithms
 import org.osmdroid.bonuspack.location.NominatimPOIProvider

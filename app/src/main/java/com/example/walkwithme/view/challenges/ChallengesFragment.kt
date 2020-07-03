@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.walkwithme.R
 
-class ChallengesFragment : Fragment() {
+class ChallengesFragment : Fragment(), ChallengesViewInterface {
 
     override fun onCreateView(
         inflater: LayoutInflater,

@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.walkwithme.R
 
-class SettingsFragment : Fragment() {
+class SettingsFragment : Fragment(), SettingsViewInterface {
 
     override fun onCreateView(
         inflater: LayoutInflater,

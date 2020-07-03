@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.example.walkwithme.MapViewInterface
 import com.example.walkwithme.R
 import com.example.walkwithme.presenter.map.MapPresenter
 import kotlinx.android.synthetic.main.fragment_map.*
@@ -19,7 +18,8 @@ import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
-class MapFragment : Fragment(), MapViewInterface {
+class MapFragment : Fragment(),
+    MapViewInterface {
 
     private var mapPresenter: MapPresenter? = null
 
