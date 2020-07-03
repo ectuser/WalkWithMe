@@ -1,6 +1,5 @@
 package com.example.walkwithme.fragments
 
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.walkwithme.R
-import com.example.walkwithme.adapter.CategoryCardAdapter
+import com.example.walkwithme.adapter.CategoryAdapter
 import com.example.walkwithme.model.category.CategoryCard
 import kotlinx.android.synthetic.main.fragment_settings.*
 
@@ -49,7 +48,7 @@ class SettingsFragment : Fragment() {
             )
         }
 
-        val cardAdapter = CategoryCardAdapter(dataList)
+        val cardAdapter = CategoryAdapter(dataList)
         categoryView.adapter = cardAdapter
     }
 
