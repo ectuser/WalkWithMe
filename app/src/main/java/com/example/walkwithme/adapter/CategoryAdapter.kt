@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.walkwithme.R
 import com.example.walkwithme.model.category.CategoryCard
 import kotlinx.android.synthetic.main.category_card.view.*
+import java.lang.Integer.max
 
 class CategoryAdapter(private val categoryCardList: ArrayList<CategoryCard>) :
     RecyclerView.Adapter<CategoryAdapter.ViewHolder>() {
@@ -29,9 +30,18 @@ class CategoryAdapter(private val categoryCardList: ArrayList<CategoryCard>) :
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val number: TextView = itemView.Number
+        val number: TextView = itemView.Priority
         val name: TextView = itemView.Name
         var image: ImageView = itemView.Image
+
+        init {
+            itemView.PriorityPlusButton.setOnClickListener {
+                itemView.Priority.text = (minOf(itemView.Priority.text.toString().toInt() + 1, 99)).toString()
+            }
+            itemView.PriorityMinusButton.setOnClickListener {
+                itemView.Priority.text = (maxOf(itemView.Priority.text.toString().toInt() - 1, 0)).toString()
+            }
+        }
     }
 
 }

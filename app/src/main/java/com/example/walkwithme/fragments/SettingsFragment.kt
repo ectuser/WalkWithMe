@@ -34,8 +34,7 @@ class SettingsFragment : Fragment() {
             ContextCompat.getDrawable(requireContext(), R.drawable.category_supermarket)!!
         )
 
-        val categoryView = CategoryRecyclerView
-        categoryView.layoutManager =
+        CategoryRecyclerView.layoutManager =
             LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
 
         val dataList = ArrayList<CategoryCard>()
@@ -43,13 +42,13 @@ class SettingsFragment : Fragment() {
         for (i in 0 until numberOfCategories) {
             dataList.add(
                 CategoryCard(
-                    i + 1, names[i], images[i]
+                    1, names[i], images[i]
                 )
             )
         }
 
         val cardAdapter = CategoryAdapter(dataList)
-        categoryView.adapter = cardAdapter
+        CategoryRecyclerView.adapter = cardAdapter
     }
 
 }
