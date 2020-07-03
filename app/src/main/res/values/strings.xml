@@ -7,7 +7,12 @@
     <string name="text_quicker">Quicker</string>
     <string name="text_more_interesting">More interesting</string>
     <string name="text_route_type">Route type</string>
+    <string name="text_user_settings">User settings</string>
     <string name="text_category_ranking">Category ranking</string>
+    <string name="test_avatar_username">Dmitry Avanesov</string>
+    <string name="test_avatar_level">Level 69</string>
+    <string name="text_username">Username</string>
     <string name="test_username">Dmitry Avanesov</string>
-    <string name="test_level">Level 69</string>
+    <string name="text_password">Password</string>
+    <string name="test_password">**************</string>
 </resources>
