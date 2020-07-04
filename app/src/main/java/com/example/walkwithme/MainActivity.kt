@@ -13,7 +13,6 @@ import com.example.walkwithme.fragments.ChallengesFragment
 import com.example.walkwithme.fragments.MapFragment
 import com.example.walkwithme.fragments.SettingsFragment
 import com.example.walkwithme.fragments.StatsFragment
-import com.example.walkwithme.presenter.map.MapPresenter
 import kotlinx.android.synthetic.main.activity_main.*
 import org.osmdroid.config.Configuration
 import java.util.*
@@ -26,16 +25,22 @@ class MainActivity :
     public override fun onCreate(
         savedInstanceState: Bundle?
     ) {
-        StrictMode.setThreadPolicy(
-            StrictMode.ThreadPolicy.Builder()
-                .permitAll()
-                .build()
-        )
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        loadFragment(MapFragment())
 
+        setConfiguration()
+        loadFragment(MapFragment())
+        setNavigation()
+    }
+
+    private fun loadFragment(fragment: Fragment) {
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.Container, fragment)
+        transaction.addToBackStack(null)
+        transaction.commit()
+    }
+
+    private fun setNavigation() {
         NavigationView.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.action_map -> {
@@ -57,6 +62,14 @@ class MainActivity :
             }
             false
         }
+    }
+
+    private fun setConfiguration() {
+        StrictMode.setThreadPolicy(
+            StrictMode.ThreadPolicy.Builder()
+                .permitAll()
+                .build()
+        )
 
         Configuration.getInstance().apply {
             userAgentValue = "OBP_Tuto/1.0"
@@ -76,13 +89,6 @@ class MainActivity :
                 Manifest.permission.ACCESS_COARSE_LOCATION
             )
         )
-    }
-
-    private fun loadFragment(fragment: Fragment) {
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.Container, fragment)
-        transaction.addToBackStack(null)
-        transaction.commit()
     }
 
     private fun requestPermissionsIfNecessary(

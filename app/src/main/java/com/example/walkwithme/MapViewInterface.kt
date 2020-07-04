@@ -12,11 +12,8 @@ interface MapViewInterface {
     fun getMarker(): Marker
     fun getRotationGestureOverlay(): RotationGestureOverlay
     fun getMyLocationOverlay(): MyLocationNewOverlay
-
     fun setMapMultiTouchControls(on: Boolean)
-
     fun mapInvalidate()
-
     fun mapAddOverlay(overlay: Overlay?)
     fun mapRemoveOverlay(overlay: Overlay?)
 

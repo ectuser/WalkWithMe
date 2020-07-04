@@ -1,15 +1,13 @@
 package com.example.walkwithme.fragments
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.example.walkwithme.MainActivity
 import com.example.walkwithme.MapViewInterface
 import com.example.walkwithme.R
-import com.example.walkwithme.presenter.map.MapPresenter
+import com.example.walkwithme.presenter.MapPresenter
 import kotlinx.android.synthetic.main.fragment_map.*
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -20,7 +18,6 @@ import org.osmdroid.views.overlay.Overlay
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
-import kotlin.collections.Map
 
 class MapFragment : Fragment(), MapViewInterface {
 
@@ -36,16 +33,26 @@ class MapFragment : Fragment(), MapViewInterface {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setPresenter()
+        setListeners()
+        setMapConfiguration()
+    }
+
+    private fun setPresenter() {
         mapPresenter = MapPresenter(this).apply {
             setOnMapTapListener()
             setRotationGestureOverlay()
             setMyLocationOverlay()
         }
+    }
 
+    private fun setListeners() {
         BuildRouteButton.setOnClickListener { mapPresenter?.buildRoute() }
         MyLocationButton.setOnClickListener { mapPresenter?.setMyLocationOverlay() }
         CompassButton.setOnClickListener { mapPresenter?.setDefaultRotation() }
+    }
 
+    private fun setMapConfiguration() {
         Map.apply {
             setTileSource(TileSourceFactory.MAPNIK)
             setMultiTouchControls(true)
