@@ -1,8 +1,9 @@
-package com.example.walkwithme.retrofit.build_route
+package com.example.walkwithme.retrofit
 
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+
 
 object ServiceBuilder {
     private val client = OkHttpClient.Builder().build()

@@ -5,22 +5,13 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.StrictMode
 import android.preference.PreferenceManager
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.example.walkwithme.fragments.ChallengesFragment
-import com.example.walkwithme.fragments.MapFragment
-import com.example.walkwithme.fragments.SettingsFragment
-import com.example.walkwithme.fragments.StatsFragment
-import com.example.walkwithme.retrofit.build_route.Endpoints
-import com.example.walkwithme.retrofit.build_route.ServiceBuilder
+import com.example.walkwithme.fragments.*
 import kotlinx.android.synthetic.main.activity_main.*
 import org.osmdroid.config.Configuration
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.util.*
 
 class MainActivity :
@@ -63,6 +54,10 @@ class MainActivity :
                 }
                 R.id.action_settings -> {
                     loadFragment(SettingsFragment())
+                    return@setOnNavigationItemSelectedListener true
+                }
+                R.id.action_request -> {
+                    loadFragment(RequestFragment())
                     return@setOnNavigationItemSelectedListener true
                 }
             }

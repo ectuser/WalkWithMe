@@ -1,12 +1,9 @@
 package com.example.walkwithme.presenter
 
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.example.walkwithme.MapViewInterface
 import com.example.walkwithme.R
 import com.example.walkwithme.model.Algorithms
-import com.example.walkwithme.retrofit.build_route.Endpoints
-import com.example.walkwithme.retrofit.build_route.ServiceBuilder
 import org.osmdroid.bonuspack.location.NominatimPOIProvider
 import org.osmdroid.bonuspack.location.POI
 import org.osmdroid.bonuspack.routing.MapQuestRoadManager
@@ -15,10 +12,6 @@ import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
-import org.osmdroid.views.overlay.Polyline
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import kotlin.collections.ArrayList
 import kotlin.math.max
 
@@ -26,32 +19,7 @@ class MapPresenter(
     private val mapInterface: MapViewInterface
 ) {
     fun requestRoute() {
-        val request = ServiceBuilder.buildService(Endpoints::class.java)
-        val call = request.getTest()
 
-        call.enqueue(object : Callback<ArrayList<String>> {
-            override fun onResponse(call: Call<ArrayList<String>>, response: Response<ArrayList<String>>) {
-                if (response.isSuccessful) {
-                    Toast.makeText(
-                        mapInterface.getMap().context,
-                        response.body()!![0],
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-                else {
-                    Toast.makeText(
-                        mapInterface.getMap().context,
-                        "Something went wrong...",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-            }
-
-            override fun onFailure(call: Call<ArrayList<String>>, t: Throwable) {
-                Toast.makeText(mapInterface.getMap().context, "${t.message}", Toast.LENGTH_LONG)
-                    .show()
-            }
-        })
     }
 
     fun buildRoute() {
