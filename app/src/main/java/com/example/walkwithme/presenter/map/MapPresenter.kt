@@ -47,7 +47,7 @@ class MapPresenter(
                 pointsOfInterest.addAll(
                     poiProvider.getPOICloseTo(
                         filteredRoute[i],
-                        "cafe",
+                        "Monument",
                         1,
                         road.mLength * 0.001
                     )
