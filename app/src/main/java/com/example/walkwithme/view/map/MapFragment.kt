@@ -1,5 +1,6 @@
 package com.example.walkwithme.view.map
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
